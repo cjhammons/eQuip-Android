@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">eQuip</string>
+
+    <!--Login Screen-->
+    <string name="email_hint">email</string>
+    <string name="password_hint">password</string>
+    <string name="create_account">Create Account</string>
+    <string name="login">Login</string>
+
+    <!-- Create Account Screen-->
+    <string name="email_title">email</string>
+    <string name="email_signup_hint">you@domain.com</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="phone_number_title">Phone Number</string>
+    <string name="phone_number_hint">(123) 456-7890</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="create_account_button">Create Account</string>
 </resources>
