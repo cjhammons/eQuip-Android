@@ -23,5 +23,10 @@
     <string name="enter_confirmation_code">Enter confirmation code sent to </string>
     <string name="confirm">Confirm</string>
     <string name="confirmation_failure">Account confirmation failure. Please try again</string>
-    <string name="confirmation_success">Account confirmation successful!</string>
+    <string name="confirmation_success">Account confirmation successful! Now Login with your new account!</string>
+    <string name="an_error_occured">An error occured</string>
+    <string name="email_already_in_use">Email already in use, please use another.</string>
+    <string name="invalid_password">Password is in an invalid form.</string>
+    <string name="wrong_code_failure">Code entered is incorrect.</string>
+    <string name="code_expired_exception">Code entered has expired</string>
 </resources>

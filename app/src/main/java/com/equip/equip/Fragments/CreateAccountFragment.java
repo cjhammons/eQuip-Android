@@ -24,6 +24,10 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserCodeDel
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.SignUpHandler;
 import com.amazonaws.regions.Regions;
+import com.amazonaws.services.cognitoidentityprovider.model.CodeDeliveryFailureException;
+import com.amazonaws.services.cognitoidentityprovider.model.InternalErrorException;
+import com.amazonaws.services.cognitoidentityprovider.model.InvalidPasswordException;
+import com.amazonaws.services.cognitoidentityprovider.model.UsernameExistsException;
 import com.equip.equip.EquipApplication;
 import com.equip.equip.R;
 
@@ -75,7 +79,6 @@ public class CreateAccountFragment extends Fragment {
         public static final String ATTRIBUTE_FIRST_NAME = "given_name";
         public static final String ATTRIBUTE_LAST_NAME = "family_name";
         public static final String ATTRIBUTE_PHONE_NUMBER = "phone_number";
-        public static final String ATTRIBUTE_PASSWORD = "password";
         public static final String ATTRIBUTE_EMAIL = "email";
 
         @Override
@@ -92,7 +95,7 @@ public class CreateAccountFragment extends Fragment {
             ClientConfiguration clientConfiguration = new ClientConfiguration();
 
             // Create a CognitoUserPool object to refer to your user pool
-            CognitoUserPool userPool = new CognitoUserPool(CreateAccountFragment.this.getContext(),
+            final CognitoUserPool userPool = new CognitoUserPool(CreateAccountFragment.this.getContext(),
                     EquipApplication.COGNITO_POOL_ID,
                     EquipApplication.COGNITO_CLIENT_ID,
                     EquipApplication.COGNITO_CLIENT_SECRET,
@@ -118,14 +121,25 @@ public class CreateAccountFragment extends Fragment {
                     }
                     FragmentTransaction ft = getFragmentManager().beginTransaction();
                     ft.addToBackStack(null);
-                    DialogFragment confirmUserFragment = ConfirmUserDialogFragment.newInstance(user, emailText.getText().toString());
+                    DialogFragment confirmUserFragment = ConfirmUserDialogFragment.newInstance(user, emailText.getText().toString(),
+                                                                                                userPool, CreateAccountFragment.this);
                     confirmUserFragment.show(ft, "confirmDialog");
                 }
 
                 @Override
                 public void onFailure(Exception exception) {
                     //TODO failure messages
+                    String toastMessage = getString(R.string.an_error_occured);
+                    if (exception instanceof UsernameExistsException){
+                        toastMessage  = getString(R.string.email_already_in_use);
+                    } else if (exception instanceof InternalErrorException){
+                        toastMessage = getString(R.string.an_error_occured);
+                    } else if (exception instanceof InvalidPasswordException) {
+                        toastMessage = getString(R.string.invalid_password);
+                    }
+
                     Log.e(TAG_FRAGMENT, exception.getMessage());
+                    Toast.makeText(getContext(), toastMessage, Toast.LENGTH_LONG).show();
                 }
             };
 
@@ -134,8 +148,6 @@ public class CreateAccountFragment extends Fragment {
                     userAttributes,
                     null,
                     signUpHandler);
-
-
 
         }
     }
