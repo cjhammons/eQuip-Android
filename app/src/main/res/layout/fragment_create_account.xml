@@ -21,10 +21,11 @@
             android:textColor="@android:color/black" />
 
         <EditText
+            android:id="@+id/email_entry"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/email_signup_hint"
-            android:id="@+id/email_entry"/>
+            android:inputType="textEmailAddress"
+            android:hint="@string/email_signup_hint" />
 
     </LinearLayout>
 
@@ -44,7 +45,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/first_name"
-            android:id="@+id/first_name_entry"/>
+            android:id="@+id/first_name_entry"
+            android:inputType="textCapWords"
+
+            android:maxLines="1"/>
 
     </LinearLayout>
 
@@ -64,7 +68,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/last_name"
-            android:id="@+id/last_name_entry"/>
+            android:inputType="textCapWords"
+            android:id="@+id/last_name_entry"
+            android:maxLines="1"/>
 
     </LinearLayout>
 
@@ -84,6 +90,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/phone_number_hint"
+            android:inputType="phone"
             android:id="@+id/phone_entry"/>
 
     </LinearLayout>
@@ -103,6 +110,7 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="textPassword"
             android:hint="@string/password"
             android:id="@+id/password_entry"/>
 
@@ -125,16 +133,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/confirm_password"
-            android:id="@+id/confirm_password_entry"/>
+            android:inputType="textPassword"
+            android:id="@+id/confirm_password_entry" />
 
     </LinearLayout>
 
     <Button
+        android:id="@+id/create_account_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/create_account_button"
         android:background="@color/colorAccent"
-        />
+        android:text="@string/create_account_button" />
 
 
 </LinearLayout>

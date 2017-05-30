@@ -12,6 +12,10 @@ import com.amazonaws.mobile.AWSMobileClient;
 public class EquipApplication extends Application {
     private final static String LOG_TAG = Application.class.getSimpleName();
 
+    public final static String COGNITO_POOL_ID       = "us-east-1_t00ZNIKzL";
+    public final static String COGNITO_CLIENT_ID     = "6nohlnto0n1429snesnmpt2fr5";
+    public final static String COGNITO_CLIENT_SECRET = "aeg03mqeaot3h8j29lt59qcut95qi5gj218401btj55p5ndl7td";
+
     @Override
     public void onCreate() {
         Log.d(LOG_TAG, "Application.onCreate - Initializing application...");
@@ -25,6 +29,5 @@ public class EquipApplication extends Application {
         // Initialize the AWS Mobile Client
         AWSMobileClient.initializeMobileClientIfNecessary(getApplicationContext());
 
-        // ... Put any application-specific initialization logic here ...
     }
 }
