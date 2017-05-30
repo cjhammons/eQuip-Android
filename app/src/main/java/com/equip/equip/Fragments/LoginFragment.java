@@ -1,5 +1,6 @@
 package com.equip.equip.Fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
@@ -10,11 +11,22 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserAttributes;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserCodeDeliveryDetails;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.AuthenticationContinuation;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.AuthenticationDetails;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.ChallengeContinuation;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.MultiFactorAuthenticationContinuation;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.SignUpHandler;
+import com.equip.equip.Activities.DashboardActivity;
+import com.equip.equip.EquipApplication;
 import com.equip.equip.R;
 
 /**
@@ -56,6 +68,55 @@ public class LoginFragment extends Fragment {
         @Override
         public void onClick(View v) {
 
+            final String email = emailText.getText().toString();
+            final String password = passwordText.getText().toString();
+
+            CognitoUserPool cognitoUserPool = EquipApplication.getUserPool(LoginFragment.this.getContext());
+            CognitoUser cognitoUser = cognitoUserPool.getUser(email);
+            // Callback handler for the sign-in process
+            AuthenticationHandler authenticationHandler = new AuthenticationHandler() {
+
+                @Override
+                public void onSuccess(CognitoUserSession userSession, CognitoDevice newDevice)                    // Sign-in was successful, cognitoUserSession will contain tokens for the user
+                {
+                    getActivity().startActivity(new Intent(getActivity(), DashboardActivity.class));
+                }
+
+                @Override
+                public void getAuthenticationDetails(AuthenticationContinuation authenticationContinuation, String userId) {
+                    // The API needs user sign-in credentials to continue
+                    AuthenticationDetails authenticationDetails = new AuthenticationDetails(userId, password, null);
+
+                    // Pass the user sign-in credentials to the continuation
+                    authenticationContinuation.setAuthenticationDetails(authenticationDetails);
+
+                    // Allow the sign-in to continue
+                    authenticationContinuation.continueTask();
+                }
+
+                @Override
+                public void getMFACode(MultiFactorAuthenticationContinuation multiFactorAuthenticationContinuation) {
+                    // Multi-factor authentication is required; get the verification code from user
+//                    multiFactorAuthenticationContinuation.setMfaCode(mfaVerificationCode);
+                    // Allow the sign-in process to continue
+//                    multiFactorAuthenticationContinuation.continueTask();
+                }
+
+                @Override
+                public void authenticationChallenge(ChallengeContinuation continuation) {
+
+                }
+
+                @Override
+                public void onFailure(Exception exception) {
+                    // Sign-in failed, check exception for the cause
+                    //tODO exceptions and such
+                    Toast.makeText(LoginFragment.this.getContext(), getString(R.string.login_failed), Toast.LENGTH_SHORT).show();
+                }
+            };
+
+            // Sign in the user
+            cognitoUser.getSessionInBackground(authenticationHandler);
         }
     }
 

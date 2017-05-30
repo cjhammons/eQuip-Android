@@ -85,6 +85,8 @@ public class LoginActivity extends AppCompatActivity {
 //                        goMain(LoginActivity.this);
 //                    }
 //                }, 2000);
+
+
     }
 
     private void doMandatorySignIn(final IdentityManager identityManager) {
@@ -108,12 +110,12 @@ public class LoginActivity extends AppCompatActivity {
                 return true;
             }
 
-            /** Go to the main activity. */
-            private void goMain(final Activity callingActivity) {
-                //TODO
+//            /** Go to the main activity. */
+//            private void goMain(final Activity callingActivity) {
+//                /
 //                callingActivity.startActivity(new Intent(callingActivity, MainActivity.class)
 //                        .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-            }
+//            }
         });
         LoginActivity.this.finish();
     }
@@ -121,8 +123,8 @@ public class LoginActivity extends AppCompatActivity {
     /** Go to the main activity. */
     private void goMain(final Activity callingActivity) {
         //TODO Go to dashboard on login
-//        callingActivity.startActivity(new Intent(callingActivity, MainActivity.class)
-//                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-//        callingActivity.finish();
+        callingActivity.startActivity(new Intent(callingActivity, DashboardActivity.class)
+                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+        callingActivity.finish();
     }
 }

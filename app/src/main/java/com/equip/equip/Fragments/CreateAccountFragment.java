@@ -92,15 +92,7 @@ public class CreateAccountFragment extends Fragment {
                 return;
             }
 
-            ClientConfiguration clientConfiguration = new ClientConfiguration();
-
-            // Create a CognitoUserPool object to refer to your user pool
-            final CognitoUserPool userPool = new CognitoUserPool(CreateAccountFragment.this.getContext(),
-                    EquipApplication.COGNITO_POOL_ID,
-                    EquipApplication.COGNITO_CLIENT_ID,
-                    EquipApplication.COGNITO_CLIENT_SECRET,
-                    clientConfiguration,
-                    Regions.US_EAST_1);
+            final CognitoUserPool userPool = EquipApplication.getUserPool(CreateAccountFragment.this.getContext());
 
 
             // Create a CognitoUserAttributes object and add user attributes

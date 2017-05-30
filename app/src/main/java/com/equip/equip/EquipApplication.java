@@ -1,9 +1,14 @@
 package com.equip.equip;
 
 import android.app.Application;
+import android.content.Context;
 import android.util.Log;
 
+import com.amazonaws.ClientConfiguration;
 import com.amazonaws.mobile.AWSMobileClient;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool;
+import com.amazonaws.regions.Regions;
+import com.equip.equip.Fragments.CreateAccountFragment;
 
 /**
  * Created by curtis on 5/24/17.
@@ -29,5 +34,17 @@ public class EquipApplication extends Application {
         // Initialize the AWS Mobile Client
         AWSMobileClient.initializeMobileClientIfNecessary(getApplicationContext());
 
+    }
+
+    public static CognitoUserPool getUserPool(Context context) {
+
+        ClientConfiguration clientConfiguration = new ClientConfiguration();
+
+        return new CognitoUserPool(context,
+                EquipApplication.COGNITO_POOL_ID,
+                EquipApplication.COGNITO_CLIENT_ID,
+                EquipApplication.COGNITO_CLIENT_SECRET,
+                clientConfiguration,
+                Regions.US_EAST_1);
     }
 }
