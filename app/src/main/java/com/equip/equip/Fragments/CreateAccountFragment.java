@@ -101,7 +101,10 @@ public class CreateAccountFragment extends Fragment {
             userAttributes.addAttribute(ATTRIBUTE_FIRST_NAME, firstNameText.getText().toString());
             userAttributes.addAttribute(ATTRIBUTE_LAST_NAME, lastNameText.getText().toString());
             // Adding user's phone number
-            userAttributes.addAttribute(ATTRIBUTE_PHONE_NUMBER, phoneNumberText.getText().toString());
+
+            String phoneString = phoneNumberText.getText().toString();
+            phoneString = "+" + phoneString.replaceAll("[^\\d.]", "");
+            userAttributes.addAttribute(ATTRIBUTE_PHONE_NUMBER, phoneString);
             // Adding user's email address
             userAttributes.addAttribute(ATTRIBUTE_EMAIL, emailText.getText().toString());
 

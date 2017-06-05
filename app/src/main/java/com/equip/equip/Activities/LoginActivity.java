@@ -16,14 +16,17 @@ import com.amazonaws.mobilehelper.auth.StartupAuthErrorDetails;
 import com.amazonaws.mobilehelper.auth.StartupAuthResult;
 import com.amazonaws.mobilehelper.auth.StartupAuthResultHandler;
 import com.amazonaws.mobilehelper.auth.signin.CognitoUserPoolsSignInProvider;
+import com.crashlytics.android.Crashlytics;
 import com.equip.equip.Fragments.LoginFragment;
 import com.equip.equip.R;
+import io.fabric.sdk.android.Fabric;
 
 public class LoginActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_login);
 
         // Check that the activity is using the layout version with

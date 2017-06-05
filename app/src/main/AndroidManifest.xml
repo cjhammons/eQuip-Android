@@ -21,6 +21,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".Activities.DashboardActivity"></activity>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="f39a2d28879c79ab5e8d669172317975bdd573e6" />
     </application>
 
 </manifest>
