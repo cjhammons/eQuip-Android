@@ -23,10 +23,18 @@
         android:inputType="number"
         />
 
+
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/confirm"
         android:id="@+id/confirm_user_button"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/resend_email_button"
+        android:text="@string/resend_email"
+        />
 
 </LinearLayout>

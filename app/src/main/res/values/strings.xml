@@ -30,6 +30,8 @@
     <string name="invalid_password">Password is in an invalid form.</string>
     <string name="wrong_code_failure">Code entered is incorrect.</string>
     <string name="code_expired_exception">Code entered has expired</string>
+    <string name="resend_email">Resend confirmation code</string>
+    <string name="confirmation_resent">Confirmation has been sent</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

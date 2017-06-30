@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "174413049513",
+    "firebase_url": "https://equip-a9497.firebaseio.com",
+    "project_id": "equip-a9497",
+    "storage_bucket": "equip-a9497.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:174413049513:android:18baca8ff51c6f4f",
+        "android_client_info": {
+          "package_name": "com.equip.equip"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "174413049513-cqu71ioe5lq1f0itq7q0frufca0m75la.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrCUUvXkW-jRTMuBYgMjnTGLik3bcqtTM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

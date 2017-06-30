@@ -2,6 +2,7 @@ package com.equip.equip.Activities;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,15 +20,25 @@ import com.amazonaws.mobilehelper.auth.signin.CognitoUserPoolsSignInProvider;
 import com.crashlytics.android.Crashlytics;
 import com.equip.equip.Fragments.LoginFragment;
 import com.equip.equip.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import io.fabric.sdk.android.Fabric;
 
 public class LoginActivity extends AppCompatActivity {
+
+
+    public static final String TAG = "LoginActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_login);
+
+
+
+
 
         // Check that the activity is using the layout version with
         // the fragment_container FrameLayout
@@ -91,6 +102,8 @@ public class LoginActivity extends AppCompatActivity {
 
 
     }
+
+
 
     private void doMandatorySignIn(final IdentityManager identityManager) {
         identityManager.signInOrSignUp(LoginActivity.this, new DefaultSignInResultHandler() {

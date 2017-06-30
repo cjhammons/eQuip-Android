@@ -1,8 +1,9 @@
 package com.equip.equip.Fragments;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,15 +12,14 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amazonaws.ClientConfiguration;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserCodeDeliveryDetails;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GenericHandler;
-import com.amazonaws.regions.Regions;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.VerificationHandler;
 
 import com.amazonaws.services.cognitoidentityprovider.model.CodeMismatchException;
 import com.amazonaws.services.cognitoidentityprovider.model.ExpiredCodeException;
-import com.equip.equip.EquipApplication;
 import com.equip.equip.R;
 
 
@@ -31,24 +31,25 @@ import com.equip.equip.R;
 public class ConfirmUserDialogFragment extends DialogFragment {
 
 
-    CognitoUser user;
-    CognitoUserPool cognitoUserPool;
+    private CognitoUserPool cognitoUserPool;
 
-    Button confirmButton;
-    EditText codeText;
-//    TextView confirmationEmail;
-    TextView enterEmailText;
+    private Button confirmButton;
+    private EditText codeText;
+    private TextView enterEmailText;
+    private Button resendButton;
 
-    String email;
-    CreateAccountFragment createAccountFragment;
+    private String email;
+    private Fragment parentFragment;
+    private CognitoUser user;
+
 
     static ConfirmUserDialogFragment newInstance(CognitoUser user, String email,
-                                                 CognitoUserPool cognitoUserPool, CreateAccountFragment createAccountFragment){
+                                                 CognitoUserPool cognitoUserPool, Fragment parentFragment){
         ConfirmUserDialogFragment fragment = new ConfirmUserDialogFragment();
         fragment.user = user;
         fragment.email = email;
         fragment.cognitoUserPool = cognitoUserPool;
-        fragment.createAccountFragment = createAccountFragment;
+        fragment.parentFragment = parentFragment;
         return fragment;
     }
 
@@ -66,16 +67,37 @@ public class ConfirmUserDialogFragment extends DialogFragment {
 
         confirmButton = (Button) view.findViewById(R.id.confirm_user_button);
         codeText = (EditText) view.findViewById(R.id.confirm_user_code);
-//        confirmationEmail = (TextView) view.findViewById(R.id.confirmation_email);
-//        confirmationEmail.setText(email);
+        resendButton = (Button) view.findViewById(R.id.resend_email_button);
         enterEmailText = (TextView) view.findViewById(R.id.enter_email_text);
+
         enterEmailText.setText(getString(R.string.enter_confirmation_code) + " " + email);
 
         confirmButton.setOnClickListener(new ConfirmListener());
+        resendButton.setOnClickListener(new ResendListener());
+
+
         return view;
     }
 
-    class ConfirmListener implements View.OnClickListener {
+    void resendCode(){
+        VerificationHandler verificationHandler = new VerificationHandler() {
+            @Override
+            public void onSuccess(CognitoUserCodeDeliveryDetails verificationCodeDeliveryMedium) {
+                Toast.makeText(getContext(), getString(R.string.confirmation_resent), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Exception exception) {
+                String s = "";
+                Log.e("Confirm resend error: ", exception.getMessage());
+            }
+        };
+
+        user.resendConfirmationCodeInBackground(verificationHandler);
+
+    }
+
+    private class ConfirmListener implements View.OnClickListener {
 
         @Override
         public void onClick(View v) {
@@ -86,8 +108,12 @@ public class ConfirmUserDialogFragment extends DialogFragment {
                 public void onSuccess() {
                     // User was successfully confirmed
                     ConfirmUserDialogFragment.this.dismiss();
-                    Toast.makeText(ConfirmUserDialogFragment.this.getContext(), R.string.confirmation_success, Toast.LENGTH_LONG).show();
-                    createAccountFragment.getFragmentManager().popBackStack();
+                    if (parentFragment instanceof LoginFragment){
+                        ((LoginFragment) parentFragment).goToDashboard();
+                    } else {
+                        Toast.makeText(ConfirmUserDialogFragment.this.getContext(), R.string.confirmation_success, Toast.LENGTH_LONG).show();
+                        parentFragment.getFragmentManager().popBackStack();
+                    }
                 }
 
                 @Override
@@ -106,9 +132,17 @@ public class ConfirmUserDialogFragment extends DialogFragment {
                 }
             };
 
-            CognitoUser user = cognitoUserPool.getUser(email);
+//            CognitoUser user = cognitoUserPool.getUser(email);
             user.confirmSignUpInBackground(codeText.getText().toString(), false, confirmationCallback);
 
+        }
+    }
+
+    private class ResendListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            resendCode();
         }
     }
 

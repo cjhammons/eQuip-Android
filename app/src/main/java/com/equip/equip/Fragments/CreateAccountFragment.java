@@ -75,11 +75,11 @@ public class CreateAccountFragment extends Fragment {
      * Listener for the create account button. Triggers the create account
      * logic with AWS.
      */
-    class CreateAccountListener implements View.OnClickListener{
-        public static final String ATTRIBUTE_FIRST_NAME = "given_name";
-        public static final String ATTRIBUTE_LAST_NAME = "family_name";
-        public static final String ATTRIBUTE_PHONE_NUMBER = "phone_number";
-        public static final String ATTRIBUTE_EMAIL = "email";
+    private class CreateAccountListener implements View.OnClickListener{
+        static final String ATTRIBUTE_FIRST_NAME = "given_name";
+        static final String ATTRIBUTE_LAST_NAME = "family_name";
+        static final String ATTRIBUTE_PHONE_NUMBER = "phone_number";
+        static final String ATTRIBUTE_EMAIL = "email";
 
         @Override
         public void onClick(View v) {

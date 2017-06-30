@@ -1,10 +1,15 @@
 package com.equip.equip.Fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,9 +30,17 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.Chal
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.MultiFactorAuthenticationContinuation;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.SignUpHandler;
+import com.amazonaws.services.cognitoidentityprovider.model.UserNotConfirmedException;
 import com.equip.equip.Activities.DashboardActivity;
 import com.equip.equip.EquipApplication;
 import com.equip.equip.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+import java.util.concurrent.Executor;
 
 /**
  * Created by curtis on 5/24/17.
@@ -40,8 +53,31 @@ public class LoginFragment extends Fragment {
     EditText passwordText;
     TextView createAccountText;
 
-    public static final String TAG_FRAGMENT = "LoginFragment";
+    public static final String TAG = "LoginFragment";
 
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mAuth = FirebaseAuth.getInstance();
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                } else {
+                    // User is signed out
+                    Log.d(TAG, "onAuthStateChanged:signed_out");
+                }
+            }
+        };
+
+    }
 
     @Nullable
     @Override
@@ -60,70 +96,55 @@ public class LoginFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
+    }
+
+    public void goToDashboard(){
+        getActivity().startActivity(new Intent(getActivity(), DashboardActivity.class));
+    }
+
     /**
      * This listener will execute the login procedure
      */
-    class LoginListener implements View.OnClickListener {
+    private class LoginListener implements View.OnClickListener {
 
         @Override
         public void onClick(View v) {
+            mAuth.signInWithEmailAndPassword(emailText.getText().toString(), passwordText.getText().toString())
+                    .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            Log.d(TAG, "sighInWithEmail:onComplete" + task.isSuccessful());
 
-            final String email = emailText.getText().toString();
-            final String password = passwordText.getText().toString();
+                            if (!task.isSuccessful()){
+                                Log.w(TAG, "signInWithEmail:failed", task.getException());
+                                Toast.makeText(getContext(), R.string.login_failed,
+                                        Toast.LENGTH_SHORT).show();
+                            } else {
+                                goToDashboard();
+                            }
 
-            CognitoUserPool cognitoUserPool = EquipApplication.getUserPool(LoginFragment.this.getContext());
-            CognitoUser cognitoUser = cognitoUserPool.getUser(email);
-            // Callback handler for the sign-in process
-            AuthenticationHandler authenticationHandler = new AuthenticationHandler() {
-
-                @Override
-                public void onSuccess(CognitoUserSession userSession, CognitoDevice newDevice)                    // Sign-in was successful, cognitoUserSession will contain tokens for the user
-                {
-                    getActivity().startActivity(new Intent(getActivity(), DashboardActivity.class));
-                }
-
-                @Override
-                public void getAuthenticationDetails(AuthenticationContinuation authenticationContinuation, String userId) {
-                    // The API needs user sign-in credentials to continue
-                    AuthenticationDetails authenticationDetails = new AuthenticationDetails(userId, password, null);
-
-                    // Pass the user sign-in credentials to the continuation
-                    authenticationContinuation.setAuthenticationDetails(authenticationDetails);
-
-                    // Allow the sign-in to continue
-                    authenticationContinuation.continueTask();
-                }
-
-                @Override
-                public void getMFACode(MultiFactorAuthenticationContinuation multiFactorAuthenticationContinuation) {
-                    // Multi-factor authentication is required; get the verification code from user
-//                    multiFactorAuthenticationContinuation.setMfaCode(mfaVerificationCode);
-                    // Allow the sign-in process to continue
-//                    multiFactorAuthenticationContinuation.continueTask();
-                }
-
-                @Override
-                public void authenticationChallenge(ChallengeContinuation continuation) {
-
-                }
-
-                @Override
-                public void onFailure(Exception exception) {
-                    // Sign-in failed, check exception for the cause
-                    //tODO exceptions and such
-                    Toast.makeText(LoginFragment.this.getContext(), getString(R.string.login_failed), Toast.LENGTH_SHORT).show();
-                }
-            };
-
-            // Sign in the user
-            cognitoUser.getSessionInBackground(authenticationHandler);
+                        }
+                    });
         }
+
     }
 
     /**
      * This listener will launch the signup fragment
      */
-    class CreateAccountListener implements View.OnClickListener{
+    private class CreateAccountListener implements View.OnClickListener{
 
         @Override
         public void onClick(View v) {
@@ -134,4 +155,5 @@ public class LoginFragment extends Fragment {
                     .commit();
         }
     }
+
 }
