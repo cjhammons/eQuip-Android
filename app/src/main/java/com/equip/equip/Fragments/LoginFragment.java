@@ -18,19 +18,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice;
-import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
-import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserAttributes;
-import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserCodeDeliveryDetails;
-import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool;
-import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession;
-import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.AuthenticationContinuation;
-import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.AuthenticationDetails;
-import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.ChallengeContinuation;
-import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.MultiFactorAuthenticationContinuation;
-import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler;
-import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.SignUpHandler;
-import com.amazonaws.services.cognitoidentityprovider.model.UserNotConfirmedException;
 import com.equip.equip.Activities.DashboardActivity;
 import com.equip.equip.EquipApplication;
 import com.equip.equip.R;
@@ -148,9 +135,9 @@ public class LoginFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            CreateAccountFragment createAccountFragment = new CreateAccountFragment();
+            CreateAccountFragment createAccountFragment = CreateAccountFragment.getInstance(mAuth);
             LoginFragment.this.getFragmentManager().beginTransaction()
-                    .replace(R.id.login_fragment_container, createAccountFragment, CreateAccountFragment.TAG_FRAGMENT)
+                    .replace(R.id.login_fragment_container, createAccountFragment, CreateAccountFragment.TAG)
                     .addToBackStack(null)
                     .commit();
         }
