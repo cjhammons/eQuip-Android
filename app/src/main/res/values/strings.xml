@@ -11,14 +11,11 @@
     <!-- Create Account Fragment-->
     <string name="email_title">email</string>
     <string name="email_signup_hint">you@domain.com</string>
-    <string name="first_name">First Name</string>
-    <string name="last_name">Last Name</string>
-    <string name="phone_number_title">Phone Number</string>
-    <string name="phone_number_hint">1234567890</string>
     <string name="password">Password</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="create_account_button">Create Account</string>
     <string name="toast_passwords_do_not_match">Passwords Do Not Match</string>
+    <string name="invalid_email_format">Invalid email format</string>
 
     <!--Confirm Account Fragment-->
     <string name="enter_confirmation_code">Enter confirmation code sent to </string>

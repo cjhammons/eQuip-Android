@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.equip.equip.Activities.DashboardActivity;
+import com.equip.equip.Activities.LoginActivity;
 import com.equip.equip.EquipApplication;
 import com.equip.equip.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -45,24 +46,30 @@ public class LoginFragment extends Fragment {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
+    public static LoginFragment getInstance(FirebaseAuth auth) {
+        LoginFragment loginFragment = new LoginFragment();
+        loginFragment.mAuth = auth;
+        return loginFragment;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAuth = FirebaseAuth.getInstance();
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // User is signed in
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                } else {
-                    // User is signed out
-                    Log.d(TAG, "onAuthStateChanged:signed_out");
-                }
-            }
-        };
+//        mAuth = FirebaseAuth.getInstance();
+//        mAuthListener = new FirebaseAuth.AuthStateListener() {
+//            @Override
+//            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+//                FirebaseUser user = firebaseAuth.getCurrentUser();
+//                if (user != null) {
+//                    // User is signed in
+//                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+//                    goToDashboard();
+//                } else {
+//                    // User is signed out
+//                    Log.d(TAG, "onAuthStateChanged:signed_out");
+//                }
+//            }
+//        };
 
     }
 
@@ -83,22 +90,13 @@ public class LoginFragment extends Fragment {
         return view;
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
-    }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
-    }
 
     public void goToDashboard(){
-        getActivity().startActivity(new Intent(getActivity(), DashboardActivity.class));
+//        Intent intent = new Intent(getActivity(), DashboardActivity.class);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+//        getActivity().startActivity(intent);
+        ((LoginActivity)getActivity()).goToDashboard();
     }
 
     /**
@@ -112,7 +110,7 @@ public class LoginFragment extends Fragment {
                     .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
-                            Log.d(TAG, "sighInWithEmail:onComplete" + task.isSuccessful());
+                            Log.d(TAG, "signInWithEmail:onComplete" + task.isSuccessful());
 
                             if (!task.isSuccessful()){
                                 Log.w(TAG, "signInWithEmail:failed", task.getException());
@@ -121,7 +119,6 @@ public class LoginFragment extends Fragment {
                             } else {
                                 goToDashboard();
                             }
-
                         }
                     });
         }
@@ -132,10 +129,9 @@ public class LoginFragment extends Fragment {
      * This listener will launch the signup fragment
      */
     private class CreateAccountListener implements View.OnClickListener{
-
         @Override
         public void onClick(View v) {
-            CreateAccountFragment createAccountFragment = CreateAccountFragment.getInstance(mAuth);
+            CreateAccountFragment createAccountFragment = CreateAccountFragment.getInstance(mAuth, LoginFragment.this);
             LoginFragment.this.getFragmentManager().beginTransaction()
                     .replace(R.id.login_fragment_container, createAccountFragment, CreateAccountFragment.TAG)
                     .addToBackStack(null)

@@ -36,6 +36,8 @@ public class CreateAccountFragment extends Fragment {
 
     FirebaseAuth mAuth;
 
+    LoginFragment loginFragment;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,9 +45,10 @@ public class CreateAccountFragment extends Fragment {
 
     }
 
-    public static CreateAccountFragment getInstance(FirebaseAuth auth){
+    public static CreateAccountFragment getInstance(FirebaseAuth auth, LoginFragment loginFragment){
         CreateAccountFragment createAccountFragment = new CreateAccountFragment();
         createAccountFragment.mAuth = auth;
+        createAccountFragment.loginFragment = loginFragment;
         return createAccountFragment;
     }
 
@@ -76,6 +79,17 @@ public class CreateAccountFragment extends Fragment {
         public void onClick(View v) {
             String email = emailText.getText().toString();
             String password = passwordText.getText().toString();
+            String passwordConfirm = passwordText.getText().toString();
+
+            if (!password.equals(passwordConfirm)) {
+                Toast.makeText(getContext(), getString(R.string.toast_passwords_do_not_match), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (!email.matches(emailRegex)){
+                Toast.makeText(getContext(), getString(R.string.invalid_email_format), Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
@@ -85,7 +99,9 @@ public class CreateAccountFragment extends Fragment {
                             if (task.isSuccessful()) {
                                 // Sign in success, update UI with the signed-in user's information
                                 Log.d(TAG, "createUserWithEmail:success");
-                                FirebaseUser user = mAuth.getCurrentUser();
+
+                                loginFragment.goToDashboard();
+
                             } else {
                                 // If sign in fails, display a message to the user.
                                 Log.w(TAG, "createUserWithEmail:failure", task.getException());
@@ -98,4 +114,6 @@ public class CreateAccountFragment extends Fragment {
         }
     }
 
+    //God forgive me
+    final String emailRegex = "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])";
 }

@@ -27,7 +27,7 @@ import com.equip.equip.R;
 /**
  * Created by curtis on 5/28/17.
  */
-
+@Deprecated
 public class ConfirmUserDialogFragment extends DialogFragment {
 
 
@@ -109,7 +109,7 @@ public class ConfirmUserDialogFragment extends DialogFragment {
                     // User was successfully confirmed
                     ConfirmUserDialogFragment.this.dismiss();
                     if (parentFragment instanceof LoginFragment){
-                        ((LoginFragment) parentFragment).goToDashboard();
+//                        ((LoginFragment) parentFragment).goToDashboard();
                     } else {
                         Toast.makeText(ConfirmUserDialogFragment.this.getContext(), R.string.confirmation_success, Toast.LENGTH_LONG).show();
                         parentFragment.getFragmentManager().popBackStack();
