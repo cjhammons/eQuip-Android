@@ -30,6 +30,18 @@
     <string name="resend_email">Resend confirmation code</string>
     <string name="confirmation_resent">Confirmation has been sent</string>
 
+    <!--Dashboard-->
+
+    <!--Drawer Strings-->
+    <string name="drawer_search">Search</string>
+    <string name="drawer_my_rentals">My Rentals</string>
+    <string name="drawer_my_profile">My Profile</string>
+    <string name="drawer_settings">Settings</string>
+    <string name="drawer_logout">Logout</string>
+    <string name="drawer_messages">Messages</string>
+    <string name="open_drawer">Drawer Open</string>
+    <string name="close_drawer">Drawer Closed</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="com.amazonaws.identity_pool_id" translatable="false">us-east-1_t00ZNIKzL</string>
