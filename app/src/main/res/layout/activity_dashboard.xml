@@ -20,7 +20,7 @@
 
         <fragment
             android:id="@+id/dashboard_fragment_container"
-            android:name="com.equip.equip.Fragments.DashboardListFragment"
+            android:name="com.equip.equip.Fragments.NearbyListFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:layout="@layout/fragment_dashboard_list" />

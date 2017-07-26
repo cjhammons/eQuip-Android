@@ -9,14 +9,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.amazonaws.mobile.AWSMobileClient;
-import com.amazonaws.mobilehelper.auth.DefaultSignInResultHandler;
-import com.amazonaws.mobilehelper.auth.IdentityManager;
-import com.amazonaws.mobilehelper.auth.IdentityProvider;
-import com.amazonaws.mobilehelper.auth.StartupAuthErrorDetails;
-import com.amazonaws.mobilehelper.auth.StartupAuthResult;
-import com.amazonaws.mobilehelper.auth.StartupAuthResultHandler;
-import com.amazonaws.mobilehelper.auth.signin.CognitoUserPoolsSignInProvider;
 import com.crashlytics.android.Crashlytics;
 import com.equip.equip.Fragments.LoginFragment;
 import com.equip.equip.R;

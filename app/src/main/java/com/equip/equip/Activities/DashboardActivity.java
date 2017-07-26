@@ -1,27 +1,18 @@
 package com.equip.equip.Activities;
 
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
 import com.equip.equip.ExtraUIElements.Drawer.DrawerHeader;
 import com.equip.equip.ExtraUIElements.Drawer.DrawerMenuItem;
-import com.equip.equip.Fragments.DashboardListFragment;
 import com.equip.equip.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.mindorks.placeholderview.PlaceHolderView;
 
 public class DashboardActivity extends AppCompatActivity {
@@ -35,6 +26,8 @@ public class DashboardActivity extends AppCompatActivity {
     private PlaceHolderView mGalleryView;
     private FirebaseUser mUser;
 
+    private DatabaseReference mDatabase;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,9 +39,13 @@ public class DashboardActivity extends AppCompatActivity {
         mUser = FirebaseAuth.getInstance().getCurrentUser();
 
 //        getSupportFragmentManager().beginTransaction()
-//                .add(R.id.dashboard_fragment_container, new DashboardListFragment()).commit();
+//                .add(R.id.dashboard_fragment_container, new NearbyListFragment()).commit();
 
         setupDrawer();
+    }
+
+    public FirebaseUser getmUser() {
+        return mUser;
     }
 
     private void setupDrawer(){
