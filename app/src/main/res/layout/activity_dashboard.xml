@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -18,12 +19,41 @@
             android:id="@+id/toolbar"
             layout="@layout/toolbar"/>
 
-        <fragment
-            android:id="@+id/dashboard_fragment_container"
-            android:name="com.equip.equip.Fragments.NearbyListFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:layout="@layout/fragment_dashboard_list" />
+        <!--<fragment-->
+            <!--android:id="@+id/dashboard_fragment_container"-->
+            <!--android:name="com.equip.equip.Fragments.EquipmentListFragments.NearbyListFragment"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--tools:layout="@layout/fragment_dashboard_list" />-->
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_marginBottom="24dp"
+            android:layout_marginRight="24dp"
+            android:elevation="8dp"
+            android:src="@drawable/ic_add"
+            fab:fab_colorNormal="@color/colorAccent"
+            fab:fab_colorPressed="@color/colorAccentSecondary" />
+
+
+<!--TODO tabs-->
+        <!--<android.support.v4.view.ViewPager-->
+            <!--android:id="@+id/tab_container"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent">-->
+
+            <!--<android.support.design.widget.TabLayout-->
+                <!--android:id="@+id/tab_layout"-->
+                <!--style="@style/MyCustomTabLayout"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content" />-->
+        <!--</android.support.v4.view.ViewPager>-->
+
+
+
     </LinearLayout>
 
     <FrameLayout
@@ -36,7 +66,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scrollbars="vertical"/>
+
     </FrameLayout>
+
 
 
 

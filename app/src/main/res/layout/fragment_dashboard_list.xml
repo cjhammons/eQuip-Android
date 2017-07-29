@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.equip.equip.Fragments.NearbyListFragment">
+    tools:context="com.equip.equip.Fragments.EquipmentListFragments.NearbyListFragment">
 
 
     <android.support.v7.widget.RecyclerView
@@ -14,17 +14,17 @@
 
     </android.support.v7.widget.RecyclerView>
 
-    <com.github.clans.fab.FloatingActionButton
-        android:id="@+id/fab_add"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
-        android:layout_marginBottom="24dp"
-        android:layout_marginRight="24dp"
-        android:elevation="8dp"
-        android:src="@drawable/ic_add"
-        fab:fab_colorNormal="@color/colorAccent"
-        fab:fab_colorPressed="@color/colorAccentSecondary" />
+    <!--<com.github.clans.fab.FloatingActionButton-->
+        <!--android:id="@+id/fab_add"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="bottom|right"-->
+        <!--android:layout_marginBottom="24dp"-->
+        <!--android:layout_marginRight="24dp"-->
+        <!--android:elevation="8dp"-->
+        <!--android:src="@drawable/ic_add"-->
+        <!--fab:fab_colorNormal="@color/colorAccent"-->
+        <!--fab:fab_colorPressed="@color/colorAccentSecondary" />-->
 
 
 </FrameLayout>

@@ -1,5 +1,6 @@
 package com.equip.equip.Activities;
 
+import android.content.Intent;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -7,13 +8,18 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import com.equip.equip.DataStructures.Equipment;
 import com.equip.equip.ExtraUIElements.Drawer.DrawerHeader;
 import com.equip.equip.ExtraUIElements.Drawer.DrawerMenuItem;
 import com.equip.equip.R;
+import com.github.clans.fab.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.mindorks.placeholderview.PlaceHolderView;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class DashboardActivity extends AppCompatActivity {
 
@@ -25,6 +31,7 @@ public class DashboardActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     private PlaceHolderView mGalleryView;
     private FirebaseUser mUser;
+    private FloatingActionButton mFab;
 
     private DatabaseReference mDatabase;
 
@@ -36,6 +43,8 @@ public class DashboardActivity extends AppCompatActivity {
         mDrawer = (DrawerLayout)findViewById(R.id.drawer_layout);
         mDrawerView = (PlaceHolderView)findViewById(R.id.drawerView);
         mToolbar = (Toolbar)findViewById(R.id.toolbar);
+        mFab = (FloatingActionButton) findViewById(R.id.fab_add);
+        mFab.setOnClickListener(new FabListener());
         mUser = FirebaseAuth.getInstance().getCurrentUser();
 
 //        getSupportFragmentManager().beginTransaction()
@@ -44,7 +53,7 @@ public class DashboardActivity extends AppCompatActivity {
         setupDrawer();
     }
 
-    public FirebaseUser getmUser() {
+    public FirebaseUser getUser() {
         return mUser;
     }
 
@@ -71,5 +80,34 @@ public class DashboardActivity extends AppCompatActivity {
 
         mDrawer.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
+    }
+
+    private class FabListener implements View.OnClickListener {
+//
+        @Override
+        public void onClick(View v) {
+//            //tODO go to another screen and junk
+////            for (int i = 0; i < 10; i++){
+////                Equipment equipment = new Equipment(i + "",
+////                        "Item " + i,
+////                        mUser.getUid(),
+////                        "",
+////                        "Bike",
+////                        null,
+////                        true);
+//////                mDatabase.child("Equipment").child(i + "").setValue(equipment);
+////                String key = mDatabase.child("equipment").push().getKey();
+////                Map<String, Object> equipmentValues = equipment.toMap();
+////
+////                Map<String, Object> childUpdates = new HashMap<>();
+////                childUpdates.put("/equipment/" + key, equipmentValues);
+////                childUpdates.put("/user-equipment/" + equipment.uId + "/" + key, equipmentValues);
+////                mDatabase.updateChildren(childUpdates);
+//            }
+
+            Intent intent = new Intent(DashboardActivity.this, CreateItemListingActivity.class);
+            startActivity(intent);
+
+        }
     }
 }

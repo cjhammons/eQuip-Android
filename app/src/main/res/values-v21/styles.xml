@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="MyCustomTabLayout" parent="@android:style/Widget.TabWidget">
+        <!--<item name="tabIndicatorColor">#FF4081</item>-->
+    </style>
+</resources>

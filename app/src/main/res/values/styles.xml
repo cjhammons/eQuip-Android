@@ -1,5 +1,4 @@
 <resources>
-
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
@@ -12,6 +11,5 @@
         <item name="spinBars">false</item>
         <item name="color">@android:color/white</item>
     </style>
-
 
 </resources>
