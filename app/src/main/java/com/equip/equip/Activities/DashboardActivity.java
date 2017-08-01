@@ -47,9 +47,6 @@ public class DashboardActivity extends AppCompatActivity {
         mFab.setOnClickListener(new FabListener());
         mUser = FirebaseAuth.getInstance().getCurrentUser();
 
-//        getSupportFragmentManager().beginTransaction()
-//                .add(R.id.dashboard_fragment_container, new NearbyListFragment()).commit();
-
         setupDrawer();
     }
 
@@ -83,28 +80,8 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private class FabListener implements View.OnClickListener {
-//
         @Override
         public void onClick(View v) {
-//            //tODO go to another screen and junk
-////            for (int i = 0; i < 10; i++){
-////                Equipment equipment = new Equipment(i + "",
-////                        "Item " + i,
-////                        mUser.getUid(),
-////                        "",
-////                        "Bike",
-////                        null,
-////                        true);
-//////                mDatabase.child("Equipment").child(i + "").setValue(equipment);
-////                String key = mDatabase.child("equipment").push().getKey();
-////                Map<String, Object> equipmentValues = equipment.toMap();
-////
-////                Map<String, Object> childUpdates = new HashMap<>();
-////                childUpdates.put("/equipment/" + key, equipmentValues);
-////                childUpdates.put("/user-equipment/" + equipment.uId + "/" + key, equipmentValues);
-////                mDatabase.updateChildren(childUpdates);
-//            }
-
             Intent intent = new Intent(DashboardActivity.this, CreateItemListingActivity.class);
             startActivity(intent);
 

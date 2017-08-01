@@ -1,8 +1,11 @@
 package com.equip.equip.DataStructures;
 
+import android.net.Uri;
+
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +49,14 @@ public class Equipment {
     }
 
     @Exclude
+    public void addImageUri(Uri imageUri){
+        if (imagePaths == null){
+            imagePaths = new ArrayList<>();
+        }
+        imagePaths.add(imageUri.toString());
+    }
+
+    @Exclude
     @Deprecated
     public Map<String, Object> toMap(boolean testBoolPlsIgnore){
         HashMap<String, Object> result = new HashMap<>();
@@ -58,7 +69,7 @@ public class Equipment {
         result.put("available", available);
         return result;
     }
-
+    @Exclude
     public Map<String, Object> toMap(){
         HashMap<String, Object> result = new HashMap<>();
         result.put("description", description);

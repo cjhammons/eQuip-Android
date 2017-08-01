@@ -45,7 +45,15 @@
     <!--Create Listing Activity-->
     <string name="description_title">Description</string>
     <string name="add_photos">Add up to 3 photos</string>
+    <string name="num_photos_added">Photos added</string>
     <string name="create_listing">Create Listing</string>
+    <string name="no_photos">You forgot to add a photo!</string>
+    <string name="take_photo">Take Photo</string>
+    <string name="add_from_phone">Add from phone</string>
+    <array name="add_photo_options">
+        <item>Take Photo</item>
+        <item>Add From Phone</item>
+    </array>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

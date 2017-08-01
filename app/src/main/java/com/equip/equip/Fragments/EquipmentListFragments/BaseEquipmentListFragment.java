@@ -19,6 +19,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.ArrayList;
 
@@ -32,7 +33,7 @@ public abstract class BaseEquipmentListFragment extends Fragment {
 
     private DatabaseReference mDatabase;
     private DatabaseReference mEquipmentReference;
-
+    private FirebaseStorage mStorage;
 
     //TODO all this shit
 
@@ -41,6 +42,7 @@ public abstract class BaseEquipmentListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mEquipmentReference = mDatabase.child("equipment");
+        mStorage = FirebaseStorage.getInstance();
     }
 
     @Override
