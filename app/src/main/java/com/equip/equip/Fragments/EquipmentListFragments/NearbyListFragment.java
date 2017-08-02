@@ -29,48 +29,9 @@ import java.util.Map;
 
 public class NearbyListFragment extends BaseEquipmentListFragment {
 
-
-//    private FloatingActionButton mFab;
-    private RecyclerView mItemList;
-
-//    private DatabaseReference mDatabase;
-//    private DatabaseReference mEquipmentReference;
-
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        mDatabase = FirebaseDatabase.getInstance().getReference();
-//        mEquipmentReference = mDatabase.child("equipment");
-//    }
-
-    //TODO onResume loads equipment
-//
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//                             Bundle savedInstanceState) {
-//        // Inflate the layout for this fragment
-//        View view = inflater.inflate(R.layout.fragment_dashboard_list, container, false);
-//        mItemList = (RecyclerView) view.findViewById(R.id.item_list);
-//        mItemList.setLayoutManager(new GridLayoutManager(getContext(), 3));
-//        mItemList.setAdapter(new EquipmentAdapter(mEquipmentReference, getContext()));
-//
-////        mFab = (FloatingActionButton) view.findViewById(R.id.fab_add);
-////        mFab.setOnClickListener(new FabListener());
-//
-//        return view;
-//    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-
-
-
     @Override
     public Query getQuery(DatabaseReference databaseReference) {
         //TODO filter by location
-
         Query query = databaseReference.child("equipment");
         return query;
     }

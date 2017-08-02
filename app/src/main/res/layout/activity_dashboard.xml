@@ -9,67 +9,52 @@
     android:layout_height="match_parent"
     tools:context="com.equip.equip.Activities.DashboardActivity">
 
-
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
         <include
             android:id="@+id/toolbar"
-            layout="@layout/toolbar"/>
-
-        <!--<fragment-->
-            <!--android:id="@+id/dashboard_fragment_container"-->
-            <!--android:name="com.equip.equip.Fragments.EquipmentListFragments.NearbyListFragment"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--tools:layout="@layout/fragment_dashboard_list" />-->
+            layout="@layout/toolbar" />
 
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/fab_add"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
-            android:layout_marginBottom="24dp"
-            android:layout_marginRight="24dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_gravity="bottom|end"
+            android:layout_marginBottom="20dp"
+            android:layout_marginEnd="20dp"
             android:elevation="8dp"
             android:src="@drawable/ic_add"
+            android:visibility="visible"
             fab:fab_colorNormal="@color/colorAccent"
             fab:fab_colorPressed="@color/colorAccentSecondary" />
 
+        <fragment
+            android:id="@+id/dashboard_fragment_container"
+            android:name="com.equip.equip.Fragments.EquipmentListFragments.NearbyListFragment"
+            android:layout_below="@id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:layout="@layout/fragment_dashboard_list" />
 
-<!--TODO tabs-->
-        <!--<android.support.v4.view.ViewPager-->
-            <!--android:id="@+id/tab_container"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent">-->
-
-            <!--<android.support.design.widget.TabLayout-->
-                <!--android:id="@+id/tab_layout"-->
-                <!--style="@style/MyCustomTabLayout"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content" />-->
-        <!--</android.support.v4.view.ViewPager>-->
-
-
-
-    </LinearLayout>
+    </RelativeLayout>
 
     <FrameLayout
         android:layout_width="250dp"
         android:layout_height="match_parent"
         android:layout_gravity="left"
-        android:background="@color/white">
+        android:background="@android:color/white">
+
         <com.mindorks.placeholderview.PlaceHolderView
             android:id="@+id/drawerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scrollbars="vertical"/>
-
+            android:scrollbars="vertical" />
     </FrameLayout>
-
-
 
 
 </android.support.v4.widget.DrawerLayout>

@@ -1,7 +1,10 @@
 package com.equip.equip.Activities;
 
 import android.content.Intent;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -32,6 +35,9 @@ public class DashboardActivity extends AppCompatActivity {
     private PlaceHolderView mGalleryView;
     private FirebaseUser mUser;
     private FloatingActionButton mFab;
+    //TODO finish tab thing?
+    private ViewPager mViewPager;
+    private TabLayout mTabLayout;
 
     private DatabaseReference mDatabase;
 
@@ -42,9 +48,15 @@ public class DashboardActivity extends AppCompatActivity {
 
         mDrawer = (DrawerLayout)findViewById(R.id.drawer_layout);
         mDrawerView = (PlaceHolderView)findViewById(R.id.drawerView);
+
         mToolbar = (Toolbar)findViewById(R.id.toolbar);
+
         mFab = (FloatingActionButton) findViewById(R.id.fab_add);
         mFab.setOnClickListener(new FabListener());
+
+//        mViewPager = (ViewPager) findViewById(R.id.tab_pager);
+//        mTabLayout = (TabLayout) findViewById(R.id.tab_layout);
+
         mUser = FirebaseAuth.getInstance().getCurrentUser();
 
         setupDrawer();

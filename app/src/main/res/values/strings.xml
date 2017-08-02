@@ -51,8 +51,8 @@
     <string name="take_photo">Take Photo</string>
     <string name="add_from_phone">Add from phone</string>
     <array name="add_photo_options">
-        <item>Take Photo</item>
         <item>Add From Phone</item>
+        <item>Take Photo</item>
     </array>
 
     <!-- TODO: Remove or change this placeholder text -->

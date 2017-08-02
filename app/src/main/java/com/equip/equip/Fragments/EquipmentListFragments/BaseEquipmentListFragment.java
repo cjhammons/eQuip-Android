@@ -20,6 +20,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -81,7 +82,9 @@ public abstract class BaseEquipmentListFragment extends Fragment {
 
                 }
             };
-            mEquipmentReference.addValueEventListener(valueEventListener);
+            if (mEquipmentReference != null) {
+                mEquipmentReference.addValueEventListener(valueEventListener);
+            }
         }
 
         @Override
@@ -94,6 +97,7 @@ public abstract class BaseEquipmentListFragment extends Fragment {
         public void onBindViewHolder(ViewHolder holder, int position) {
             //TODO use picasso to load image
             Equipment equipment = mEquipmentList.get(position);
+            Picasso.with(getActivity()).load(equipment.imagePaths.get(0)).into(holder.mImage);
         }
 
         @Override

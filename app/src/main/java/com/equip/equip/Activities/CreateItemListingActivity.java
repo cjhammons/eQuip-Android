@@ -54,7 +54,7 @@ import java.util.Map;
 /**
  * Created by curtis on 7/19/17.
  */
-
+//TODO location tagging
 public class CreateItemListingActivity extends Activity {
 
     private EditText mDescriptionText;
@@ -125,6 +125,7 @@ public class CreateItemListingActivity extends Activity {
         super.onResume();
     }
 
+    //TODO figure out why the camera isn't triggering this
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -140,17 +141,6 @@ public class CreateItemListingActivity extends Activity {
         }
     }
 
-    private class AddPhotoListener implements View.OnClickListener {
-
-        @Override
-        public void onClick(View v) {
-            //TODO launch camera
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType("image/*");
-            startActivityForResult(intent, REQUEST_IMAGE_FROM_PHONE);
-        }
-    }
-
     class AddPhotoDialogFragment extends DialogFragment{
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState){
@@ -162,7 +152,7 @@ public class CreateItemListingActivity extends Activity {
                     int requestCode;
                     switch (which){
                         //Take Photo
-                        case 0:
+                        case REQUEST_IMAGE_CAPTURE:
                             intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                             requestCode = REQUEST_IMAGE_CAPTURE;
 
@@ -189,17 +179,17 @@ public class CreateItemListingActivity extends Activity {
                                 Uri imageUri = FileProvider.getUriForFile(CreateItemListingActivity.this,
                                                                     "com.example.android.fileprovider",
                                                                     imageFile);
-                                imageFile.getParentFile().mkdirs();
-                                try {
-                                    imageFile.createNewFile();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+//                                imageFile.getParentFile().mkdirs();
+//                                try {
+//                                    imageFile.createNewFile();
+//                                } catch (IOException e) {
+//                                    e.printStackTrace();
+//                                }
                                 intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
                             }
                             break;
                         //Add from phone
-                        case 1:
+                        case REQUEST_IMAGE_FROM_PHONE:
                         default:
                             intent = new Intent(Intent.ACTION_GET_CONTENT);
                             requestCode = REQUEST_IMAGE_FROM_PHONE;
@@ -211,6 +201,20 @@ public class CreateItemListingActivity extends Activity {
             });
 
             return builder.create();
+        }
+        @Override
+        public void onActivityResult(int requestCode, int resultCode, Intent data) {
+            super.onActivityResult(requestCode, resultCode, data);
+            if ((requestCode == REQUEST_IMAGE_FROM_PHONE || requestCode == REQUEST_IMAGE_CAPTURE)
+                    && resultCode == Activity.RESULT_OK){
+                try {
+                    InputStream inputStream = CreateItemListingActivity.this.getContentResolver().openInputStream(data.getData());
+                    mPhotoStreams.add(inputStream);
+                    Picasso.with(CreateItemListingActivity.this).load(data.getData()).into(imageView);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
