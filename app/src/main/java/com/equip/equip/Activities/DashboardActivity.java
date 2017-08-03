@@ -14,6 +14,7 @@ import android.view.View;
 import com.equip.equip.DataStructures.Equipment;
 import com.equip.equip.ExtraUIElements.Drawer.DrawerHeader;
 import com.equip.equip.ExtraUIElements.Drawer.DrawerMenuItem;
+import com.equip.equip.Fragments.EquipmentListFragments.NearbyListFragment;
 import com.equip.equip.R;
 import com.github.clans.fab.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,7 +28,6 @@ import java.util.Map;
 public class DashboardActivity extends AppCompatActivity {
 
     public static final String TAG = "DashboardActivity";
-
 
     private PlaceHolderView mDrawerView;
     private DrawerLayout mDrawer;
@@ -59,6 +59,10 @@ public class DashboardActivity extends AppCompatActivity {
 
         mUser = FirebaseAuth.getInstance().getCurrentUser();
 
+        getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.fragment_container, new NearbyListFragment())
+                .commit();
         setupDrawer();
     }
 

@@ -33,13 +33,19 @@
             fab:fab_colorNormal="@color/colorAccent"
             fab:fab_colorPressed="@color/colorAccentSecondary" />
 
-        <fragment
-            android:id="@+id/dashboard_fragment_container"
-            android:name="com.equip.equip.Fragments.EquipmentListFragments.NearbyListFragment"
+        <!--<fragment-->
+            <!--android:id="@+id/dashboard_fragment_container"-->
+            <!--android:name="com.equip.equip.Fragments.EquipmentListFragments.BaseEquipmentListFragment"-->
+            <!--android:layout_below="@id/toolbar"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--tools:layout="@layout/fragment_dashboard_list" />-->
+
+        <FrameLayout
             android:layout_below="@id/toolbar"
+            android:id="@+id/fragment_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:layout="@layout/fragment_dashboard_list" />
+            android:layout_height="match_parent"/>
 
     </RelativeLayout>
 

@@ -23,6 +23,7 @@ public class Equipment {
     public String category;
     public List<String> imagePaths;
     public boolean available;
+    public String key;
 
     public Equipment(){
         //Default
@@ -49,6 +50,11 @@ public class Equipment {
     }
 
     @Exclude
+    public void addKey(String key){
+        this.key = key;
+    }
+
+    @Exclude
     public void addImageUri(Uri imageUri){
         if (imagePaths == null){
             imagePaths = new ArrayList<>();
@@ -72,6 +78,7 @@ public class Equipment {
     @Exclude
     public Map<String, Object> toMap(){
         HashMap<String, Object> result = new HashMap<>();
+        result.put("key", key);
         result.put("description", description);
         result.put("ownerId", ownerId);
         result.put("borrowerId", borrowerId);
