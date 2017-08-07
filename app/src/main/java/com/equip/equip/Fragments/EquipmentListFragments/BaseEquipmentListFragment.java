@@ -81,11 +81,11 @@ public abstract class BaseEquipmentListFragment extends Fragment {
                         boolean add = true;
                         boolean remove = true;
                         Equipment equipment = equipmentSnapshot.getValue(Equipment.class);
-                        if (equipment.available) {
+                        if (equipment.getAvailable()) {
                             remove = false;
                         }
                         for (Equipment e : mEquipmentList){
-                            if (e.key.equals(equipment.key)){
+                            if (e.getKey().equals(equipment.getKey())){
                                 add = false;
                                 break;
                             }
@@ -127,10 +127,10 @@ public abstract class BaseEquipmentListFragment extends Fragment {
                 public void onClick(View v) {
                 }
             });
-            if (equipment.imagePaths == null) return;
+            if (equipment.getImagePaths() == null) return;
             int dimension = 350;
             Picasso.with(getActivity())
-                    .load(equipment.imagePaths.get(0))
+                    .load(equipment.getImagePaths().get(0))
                     .resize(dimension, dimension)
                     .centerCrop()
                     .into(holder.mImage);
