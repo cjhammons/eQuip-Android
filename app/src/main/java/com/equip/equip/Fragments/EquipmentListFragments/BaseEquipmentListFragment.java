@@ -1,6 +1,9 @@
 package com.equip.equip.Fragments.EquipmentListFragments;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,8 +14,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.equip.equip.Activities.EquipmentDetailActivity;
 import com.equip.equip.DataStructures.Equipment;
 import com.equip.equip.R;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -20,6 +26,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -36,11 +43,13 @@ public abstract class BaseEquipmentListFragment extends Fragment {
 
     private DatabaseReference mDatabaseReference;
     private EquipmentAdapter mEquipmentAdapter;
+    private StorageReference mStorageReference;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        mStorageReference = FirebaseStorage.getInstance().getReference();
     }
 
     @Override
@@ -118,22 +127,44 @@ public abstract class BaseEquipmentListFragment extends Fragment {
         }
 
         @Override
-        public void onBindViewHolder(ViewHolder holder, final int position) {
+        public void onBindViewHolder(final ViewHolder holder, final int position) {
             Log.d(LOG_TAG, "onBindViewHolder (" + position + ")");
-            Equipment equipment = mEquipmentList.get(position);
+            final Equipment equipment = mEquipmentList.get(position);
             //TODO load equipment detail screen
             holder.mImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Intent intent = new Intent(getContext(), EquipmentDetailActivity.class);
+                    intent.putExtra("equipmentKey", equipment.getKey());
+                    startActivity(intent);
                 }
             });
-            if (equipment.getImagePaths() == null) return;
-            int dimension = 350;
-            Picasso.with(getActivity())
-                    .load(equipment.getImagePaths().get(0))
-                    .resize(dimension, dimension)
-                    .centerCrop()
-                    .into(holder.mImage);
+            //Take first image's thumbnail. This can be changed
+            String path = "equipment/" + equipment.getKey() + "/thumbnail_0.jpg";
+            mStorageReference.child(path).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    int dimension = 350;
+                    Picasso.with(getActivity())
+                            .load(uri)
+                            .resize(dimension, dimension)
+                            .centerCrop()
+                            .into(holder.mImage);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.e(LOG_TAG + ": load thumbnail", e.getMessage());
+                }
+            });
+
+//            if (equipment.getImagePaths() == null) return;
+//            int dimension = 350;
+//            Picasso.with(getActivity())
+//                    .load(equipment.getImagePaths().get(0))
+//                    .resize(dimension, dimension)
+//                    .centerCrop()
+//                    .into(holder.mImage);
         }
 
         @Override

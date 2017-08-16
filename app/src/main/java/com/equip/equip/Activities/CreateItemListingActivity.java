@@ -6,6 +6,8 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -32,7 +34,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.Exclude;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -51,6 +52,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 /**
  * Created by curtis on 7/19/17.
@@ -77,6 +79,8 @@ public class CreateItemListingActivity extends Activity {
     private static final int REQUEST_IMAGE_CAPTURE = 1;
 
     private static final int PHOTO_DISPLAY_DIMENSION = 400;
+
+    private Bitmap mThumbnail;
 
     //I shouldn't have to use this but onActivityResult() is misbehaving to the extreme
     private Uri cameraUri;
@@ -131,12 +135,13 @@ public class CreateItemListingActivity extends Activity {
         super.onResume();
     }
 
-    //TODO figure out why the camera isn't triggering this
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode != RESULT_OK) return;
+        File thumbFile;
         switch (requestCode){
+
             case REQUEST_IMAGE_FROM_PHONE:
                 try {
                 InputStream inputStream = this.getContentResolver().openInputStream(data.getData());
@@ -153,6 +158,7 @@ public class CreateItemListingActivity extends Activity {
             case REQUEST_IMAGE_CAPTURE:
 //                if (data.getExtras() == null) return;
 //                Uri uri = (Uri) data.getExtras().get(MediaStore.EXTRA_OUTPUT);
+                thumbFile = new File(String.valueOf(cameraUri));
 
                 Picasso.with(this)
                         .load(cameraUri)
@@ -161,6 +167,7 @@ public class CreateItemListingActivity extends Activity {
                         .into(imageView);
                 break;
         }
+
     }
 
     void handlePhoto(int selection){
@@ -270,11 +277,9 @@ public class CreateItemListingActivity extends Activity {
                 }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Uri downloadUri = taskSnapshot.getDownloadUrl();
-                        mEquipment.addImageUri(downloadUri);
-                        updateItemInDatabase();
                     }
                 });
+
             }
 
             CreateItemListingActivity.this.finish();

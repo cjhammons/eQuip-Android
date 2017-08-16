@@ -18,12 +18,18 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 
+import com.equip.equip.DataStructures.User;
 import com.equip.equip.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class CreateAccountFragment extends Fragment {
 
@@ -71,13 +77,13 @@ public class CreateAccountFragment extends Fragment {
 
     /**
      * Listener for the create account button. Triggers the create account
-     * logic with AWS.
+     * logic with Firebase.
      */
     private class CreateAccountListener implements View.OnClickListener{
 
         @Override
         public void onClick(View v) {
-            String email = emailText.getText().toString();
+            final String email = emailText.getText().toString();
             String password = passwordText.getText().toString();
             String passwordConfirm = passwordText.getText().toString();
 
@@ -99,7 +105,16 @@ public class CreateAccountFragment extends Fragment {
                             if (task.isSuccessful()) {
                                 // Sign in success, update UI with the signed-in user's information
                                 Log.d(TAG, "createUserWithEmail:success");
+                                FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                                User user = new User(currentUser.getUid(),
+                                        email,
+                                        "");
+                                Map<String, Object> userValues = user.toMap();
+                                final Map<String, Object> childUpdates = new HashMap<>();
+                                childUpdates.put("/users/" + currentUser.getUid(), userValues);
 
+                                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+                                databaseReference.updateChildren(childUpdates);
                                 loginFragment.goToDashboard();
 
                             } else {

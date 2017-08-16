@@ -55,6 +55,10 @@
         <item>Take Photo</item>
     </array>
 
+    <!--Equipment Detail Activity-->
+    <string name="contact_info">Contact Information</string>
+
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="com.amazonaws.identity_pool_id" translatable="false">us-east-1_t00ZNIKzL</string>

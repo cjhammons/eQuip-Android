@@ -28,13 +28,14 @@ class Equipment {
         //Default
     }
 
-    constructor(description: String, ownerId: String, borrowerId: String, category: String, imagePaths: MutableList<String>, available: Boolean) {
+    constructor(description: String, ownerId: String, borrowerId: String, category: String, imagePaths: MutableList<String>?, available: Boolean) {
         this.description = description
         this.ownerId = ownerId
         this.borrowerId = borrowerId
         this.category = category
         this.imagePaths = imagePaths
         this.available = available
+        this.key = ""
     }
 
     @Exclude
@@ -49,6 +50,7 @@ class Equipment {
             return
         }
         this.available = true
+        this.borrowerId = ""
     }
 
     @Exclude
@@ -61,6 +63,7 @@ class Equipment {
         if (imagePaths == null) {
             imagePaths = ArrayList<String>()
         }
+
         imagePaths!!.add(imageUri.toString())
     }
 
@@ -72,7 +75,9 @@ class Equipment {
         result.put("ownerId", ownerId)
         result.put("borrowerId", borrowerId)
         result.put("category", category)
-        result.put("imagePaths", imagePaths!!)
+        if (imagePaths != null) {
+            result.put("imagePaths", imagePaths!!)
+        }
         result.put("available", available)
         return result
     }
