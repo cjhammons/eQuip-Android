@@ -25,7 +25,7 @@ import com.mindorks.placeholderview.PlaceHolderView;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DashboardActivity extends AppCompatActivity {
+public class DashboardActivity extends AppCompatActivity implements DrawerMenuItem.DrawerCallBack{
 
     public static final String TAG = "DashboardActivity";
 
@@ -38,8 +38,6 @@ public class DashboardActivity extends AppCompatActivity {
     //TODO finish tab thing?
     private ViewPager mViewPager;
     private TabLayout mTabLayout;
-
-    private DatabaseReference mDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,20 +64,27 @@ public class DashboardActivity extends AppCompatActivity {
         setupDrawer();
     }
 
-    public FirebaseUser getUser() {
-        return mUser;
-    }
-
     private void setupDrawer(){
+        DrawerMenuItem search = new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_SEARCH);
+        search.setDrawerCallBack(this);
+        DrawerMenuItem rentals = new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_MY_RENTALS);
+        rentals.setDrawerCallBack(this);
+        DrawerMenuItem profile = new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_MY_PROFILE);
+        profile.setDrawerCallBack(this);
+        DrawerMenuItem messages = new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_MESSAGES);
+        messages.setDrawerCallBack(this);
+        DrawerMenuItem settings = new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_SETTINGS);
+        settings.setDrawerCallBack(this);
+        DrawerMenuItem logout = new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_LOGOUT);
+        logout.setDrawerCallBack(this);
         mDrawerView
                 .addView(new DrawerHeader(mUser.getDisplayName(), mUser.getEmail(), mUser.getPhotoUrl()))
-                .addView(new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_SEARCH))
-                .addView(new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_MY_RENTALS))
-                .addView(new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_MY_PROFILE))
-                .addView(new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_MESSAGES))
-                .addView(new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_SETTINGS))
-                .addView(new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_LOGOUT));
-
+                .addView(search)
+                .addView(rentals)
+                .addView(profile)
+                .addView(messages)
+                .addView(settings)
+                .addView(logout);
         ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.open_drawer, R.string.close_drawer){
             @Override
             public void onDrawerOpened(View drawerView) {
@@ -93,6 +98,39 @@ public class DashboardActivity extends AppCompatActivity {
 
         mDrawer.addDrawerListener(drawerToggle);
         drawerToggle.syncState();
+    }
+
+
+    @Override
+    public void onItemSearchSelected() {
+        //todo
+    }
+
+    @Override
+    public void onMyRentalsSelected() {
+        //todo
+    }
+
+    @Override
+    public void onMyProfileSelected() {
+        //todo
+    }
+
+    @Override
+    public void onMessagesSelected() {
+        //todo
+    }
+
+    @Override
+    public void onSettingsSelected() {
+        //todo
+    }
+
+    @Override
+    public void onLogoutSelected() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        FirebaseAuth.getInstance().signOut();
+        startActivity(intent);
     }
 
     private class FabListener implements View.OnClickListener {

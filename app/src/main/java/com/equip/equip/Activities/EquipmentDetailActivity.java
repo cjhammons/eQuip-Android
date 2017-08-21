@@ -102,9 +102,6 @@ public class EquipmentDetailActivity extends AppCompatActivity {
         databaseReference.addListenerForSingleValueEvent(userEventListener);
 
 
-
-
-
     }
 
 }

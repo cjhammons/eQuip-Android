@@ -70,16 +70,22 @@ public class DrawerMenuItem {
     private void onMenuItemClick(){
         switch (mMenuPosition){
             case DRAWER_MENU_ITEM_SEARCH:
+                mCallBack.onItemSearchSelected();
                 break;
             case DRAWER_MENU_ITEM_MY_RENTALS:
+                mCallBack.onMyRentalsSelected();
                 break;
             case DRAWER_MENU_ITEM_MY_PROFILE:
+                mCallBack.onMyProfileSelected();
                 break;
             case DRAWER_MENU_ITEM_MESSAGES:
+                mCallBack.onMessagesSelected();
                 break;
             case DRAWER_MENU_ITEM_SETTINGS:
+                mCallBack.onSettingsSelected();
                 break;
             case DRAWER_MENU_ITEM_LOGOUT:
+                mCallBack.onLogoutSelected();
                 break;
         }
     }
@@ -89,13 +95,11 @@ public class DrawerMenuItem {
     }
 
     public interface DrawerCallBack{
-        void onProfileMenuSelected();
-        void onRequestMenuSelected();
-        void onGroupsMenuSelected();
-        void onMessagesMenuSelected();
-        void onNotificationsMenuSelected();
-        void onSettingsMenuSelected();
-        void onTermsMenuSelected();
-        void onLogoutMenuSelected();
+        void onItemSearchSelected();
+        void onMyRentalsSelected();
+        void onMyProfileSelected();
+        void onMessagesSelected();
+        void onSettingsSelected();
+        void onLogoutSelected();
     }
 }
