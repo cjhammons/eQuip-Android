@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 
 import com.equip.equip.DataStructures.Equipment;
+import com.equip.equip.DataStructures.User;
 import com.equip.equip.ExtraUIElements.Drawer.DrawerHeader;
 import com.equip.equip.ExtraUIElements.Drawer.DrawerMenuItem;
 import com.equip.equip.Fragments.EquipmentListFragments.NearbyListFragment;
@@ -56,6 +57,7 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
 //        mTabLayout = (TabLayout) findViewById(R.id.tab_layout);
 
         mUser = FirebaseAuth.getInstance().getCurrentUser();
+
 
         getSupportFragmentManager()
                 .beginTransaction()

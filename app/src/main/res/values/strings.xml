@@ -57,6 +57,8 @@
 
     <!--Equipment Detail Activity-->
     <string name="contact_info">Contact Information</string>
+    <string name="reserve_button">Reserve</string>
+    <string name="reserved">The owner has been notified of your reservation</string>
 
 
     <!-- TODO: Remove or change this placeholder text -->

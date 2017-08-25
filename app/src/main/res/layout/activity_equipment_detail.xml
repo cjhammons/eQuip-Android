@@ -21,13 +21,26 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/contact_info"
-        android:textColor="@android:color/black" />
+        android:textColor="@android:color/black"
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/owner_email"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/reserve_button"
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/reserve_button" />
+    </RelativeLayout>
 
 
 </LinearLayout>

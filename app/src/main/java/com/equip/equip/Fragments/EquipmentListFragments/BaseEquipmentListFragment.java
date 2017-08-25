@@ -35,6 +35,8 @@ import java.util.List;
 /**
  * Created by curtis on 7/19/17.
  *
+ * This Fragment handles displaying equipment information. The only method that needs to be
+ * extended is is getQuery(), which specifies how to filter the equipment entries in the database.
  */
 
 public abstract class BaseEquipmentListFragment extends Fragment {

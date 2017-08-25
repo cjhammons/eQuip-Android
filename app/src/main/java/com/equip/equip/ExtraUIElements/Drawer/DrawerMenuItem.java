@@ -14,8 +14,9 @@ import java.io.BufferedReader;
 
 /**
  * Created by curtis on 7/4/17.
+ *
+ * Heavily based on the example given here: https://medium.com/@janishar.ali/navigation-drawer-android-example-8dfe38c66f59
  */
-
 
 @Layout(R.layout.drawer_item)
 public class DrawerMenuItem {

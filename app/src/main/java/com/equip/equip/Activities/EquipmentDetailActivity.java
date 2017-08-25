@@ -6,10 +6,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.equip.equip.DataStructures.Equipment;
+import com.equip.equip.DataStructures.Reservation;
 import com.equip.equip.DataStructures.User;
 import com.equip.equip.R;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -24,6 +27,11 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EquipmentDetailActivity extends AppCompatActivity {
 
@@ -61,6 +69,7 @@ public class EquipmentDetailActivity extends AppCompatActivity {
         final ImageView image = (ImageView) findViewById(R.id.equipment_picture);
         TextView description = (TextView) findViewById(R.id.equipment_description);
         final TextView email = (TextView) findViewById(R.id.owner_email);
+        Button reserveButton = (Button) findViewById(R.id.reserve_button);
 
         StorageReference storageReference = FirebaseStorage.getInstance().getReference();
         String path = "equipment/" + mEquipment.getKey() + "/0.jpg";
@@ -101,7 +110,38 @@ public class EquipmentDetailActivity extends AppCompatActivity {
         };
         databaseReference.addListenerForSingleValueEvent(userEventListener);
 
+        reserveButton.setOnClickListener(new ReserveButtonListener());
 
+
+    }
+
+    private class ReserveButtonListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            Reservation reservation = new Reservation(mEquipment.getKey(), mEquipment.getOwnerId(), user.getUid());
+
+            String dateTime = SimpleDateFormat.getDateTimeInstance().format(new Date()).toString();
+            reservation.reserve(dateTime);
+
+            mEquipment.setBorrowerId(user.getUid());
+            mEquipment.setAvailable(false);
+
+            String key = databaseReference.child("reservations").push().getKey();
+
+            Map<String, Object> childUpdates = new HashMap<>();
+            childUpdates.put("/reservations/" + key, reservation.toMap());
+            childUpdates.put("/equipment/" + mEquipment.getKey(), mEquipment.toMap());
+            childUpdates.put("/user-equipment/"
+                            + user.getUid()
+                            + mEquipment.getKey(),
+                            mEquipment.toMap());
+            databaseReference.updateChildren(childUpdates);
+            Toast.makeText(EquipmentDetailActivity.this, R.string.reserved, Toast.LENGTH_SHORT).show();
+            finish();
+        }
     }
 
 }

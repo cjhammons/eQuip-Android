@@ -15,7 +15,8 @@ class User {
     var equipmentListings: MutableList<String>? = null
     var picUrl: String = ""
     var googleConnected: Boolean = false
-    var facebookConnected: Boolean = false;
+    var facebookConnected: Boolean = false
+    var notificationTokens: MutableList<String>? = null
 
 
     constructor(){
@@ -37,6 +38,16 @@ class User {
     }
 
     @Exclude
+    fun addToken(token: String){
+        if (notificationTokens == null){
+            notificationTokens = ArrayList<String>()
+        }
+        if (notificationTokens!!.contains(token))
+            return
+        notificationTokens!!.add(token)
+    }
+
+    @Exclude
     fun toMap(): Map<String, Any> {
         val result = HashMap<String, Any>()
         result.put("userId", userId)
@@ -44,6 +55,9 @@ class User {
         result.put("displayName", displayName)
         if (equipmentListings != null) {
             result.put("equipmentListings", equipmentListings!!)
+        }
+        if (notificationTokens != null){
+            result.put("notificationTokens", notificationTokens!!)
         }
         result.put("picUrl", picUrl)
         result.put("googleConnected", googleConnected)

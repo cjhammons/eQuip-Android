@@ -10,10 +10,20 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.equip.equip.DataStructures.User;
 import com.equip.equip.Fragments.LoginFragment;
 import com.equip.equip.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.iid.FirebaseInstanceId;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -74,15 +84,34 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-//    /** Go to the main activity. */
-//    private void goMain(final Activity callingActivity) {
-//        //TODO Go to dashboard on login
-//        callingActivity.startActivity(new Intent(callingActivity, DashboardActivity.class)
-//                .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-//        callingActivity.finish();
-//    }
+    /**
+     * Gets the firebase instanceID tokens of the device and attaches it to the user's
+     * database profile. This ID allows for the sending of notifications to the device.
+     */
+    void addNotificationTokens(){
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users/" + mAuth.getCurrentUser().getUid());
+        final String token = FirebaseInstanceId.getInstance().getToken();
+        ValueEventListener valueEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                user.addToken(token);
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+                Map<String, Object> childUpdates = new HashMap<>();
+                childUpdates.put("users/"+ mAuth.getCurrentUser().getUid(), user.toMap());
+                ref.updateChildren(childUpdates);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        userRef.addValueEventListener(valueEventListener);
+    }
 
     public void goToDashboard(){
+        addNotificationTokens();
         Intent intent = new Intent(this, DashboardActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
