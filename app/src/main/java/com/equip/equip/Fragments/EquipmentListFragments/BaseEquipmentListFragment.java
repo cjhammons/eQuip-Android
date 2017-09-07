@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -42,16 +43,19 @@ import java.util.List;
 public abstract class BaseEquipmentListFragment extends Fragment {
 
     private RecyclerView mEquipmentRecyclerView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     private DatabaseReference mDatabaseReference;
     private EquipmentAdapter mEquipmentAdapter;
     private StorageReference mStorageReference;
+    private Query mQuery;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDatabaseReference = FirebaseDatabase.getInstance().getReference();
         mStorageReference = FirebaseStorage.getInstance().getReference();
+        mQuery = getQuery(mDatabaseReference);
     }
 
     @Override
@@ -61,15 +65,20 @@ public abstract class BaseEquipmentListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_dashboard_list, container, false);
         mEquipmentRecyclerView = (RecyclerView) view.findViewById(R.id.item_list);
         mEquipmentRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
-        mEquipmentAdapter = new EquipmentAdapter(getQuery(mDatabaseReference));
+        mEquipmentAdapter = new EquipmentAdapter(mQuery);
         mEquipmentRecyclerView.setAdapter(mEquipmentAdapter);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshLayout);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mEquipmentAdapter.notifyDataSetChanged();
+                //todo
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+        });
         return view;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
 
     public abstract Query getQuery(DatabaseReference databaseReference);
 

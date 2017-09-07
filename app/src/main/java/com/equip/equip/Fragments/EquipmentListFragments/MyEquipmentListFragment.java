@@ -1,5 +1,10 @@
 package com.equip.equip.Fragments.EquipmentListFragments;
 
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
@@ -19,4 +24,5 @@ public class MyEquipmentListFragment extends BaseEquipmentListFragment {
         String query = "user-equipment/" + uId;
         return databaseReference.child(query);
     }
+
 }

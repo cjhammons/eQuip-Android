@@ -15,6 +15,7 @@ import com.equip.equip.DataStructures.Equipment;
 import com.equip.equip.DataStructures.User;
 import com.equip.equip.ExtraUIElements.Drawer.DrawerHeader;
 import com.equip.equip.ExtraUIElements.Drawer.DrawerMenuItem;
+import com.equip.equip.Fragments.EquipmentListFragments.MyEquipmentListFragment;
 import com.equip.equip.Fragments.EquipmentListFragments.NearbyListFragment;
 import com.equip.equip.R;
 import com.github.clans.fab.FloatingActionButton;
@@ -61,7 +62,8 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
 
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(R.id.fragment_container, new NearbyListFragment())
+                .replace(R.id.fragment_container, new NearbyListFragment())
+                .addToBackStack("Nearby")
                 .commit();
         setupDrawer();
     }
@@ -79,13 +81,16 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
         settings.setDrawerCallBack(this);
         DrawerMenuItem logout = new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_LOGOUT);
         logout.setDrawerCallBack(this);
+        DrawerMenuItem myEquipment = new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_MY_EQUIPMENT);
+        myEquipment.setDrawerCallBack(this);
         mDrawerView
                 .addView(new DrawerHeader(mUser.getDisplayName(), mUser.getEmail(), mUser.getPhotoUrl()))
-                .addView(search)
-                .addView(rentals)
-                .addView(profile)
-                .addView(messages)
-                .addView(settings)
+//                .addView(search)
+//                .addView(rentals)
+//                .addView(profile)
+//                .addView(messages)
+//                .addView(settings)
+                .addView(myEquipment)
                 .addView(logout);
         ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.open_drawer, R.string.close_drawer){
             @Override
@@ -126,6 +131,16 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
     @Override
     public void onSettingsSelected() {
         //todo
+    }
+
+    @Override
+    public void onMyEquipmentSelected() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, new MyEquipmentListFragment())
+                .addToBackStack("MyEquipment")
+                .commit();
+        mDrawer.closeDrawers();
     }
 
     @Override

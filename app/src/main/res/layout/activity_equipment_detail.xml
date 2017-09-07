@@ -36,10 +36,31 @@
 
         <Button
             android:id="@+id/reserve_button"
-            android:layout_centerHorizontal="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
             android:text="@string/reserve_button" />
+
+        <LinearLayout
+            android:id="@+id/reserved_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/reserve_button"
+            android:layout_centerHorizontal="true"
+            android:visibility="visible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/reserved_by"
+                android:textColor="@android:color/black" />
+
+            <TextView
+                android:id="@+id/reserved_by"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black" />
+        </LinearLayout>
     </RelativeLayout>
 
 

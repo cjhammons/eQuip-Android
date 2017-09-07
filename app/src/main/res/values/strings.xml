@@ -41,6 +41,7 @@
     <string name="drawer_messages">Messages</string>
     <string name="open_drawer">Drawer Open</string>
     <string name="close_drawer">Drawer Closed</string>
+    <string name="my_equipment">My Equipment</string>
 
     <!--Create Listing Activity-->
     <string name="description_title">Description</string>
@@ -59,9 +60,11 @@
     <string name="contact_info">Contact Information</string>
     <string name="reserve_button">Reserve</string>
     <string name="reserved">The owner has been notified of your reservation</string>
+    <string name="reserved_by">Reserved by</string>
 
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="com.amazonaws.identity_pool_id" translatable="false">us-east-1_t00ZNIKzL</string>
+    <string name="title_activity_my_listings">MyListingsActivity</string>
 </resources>

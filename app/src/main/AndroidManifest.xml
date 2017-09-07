@@ -30,10 +30,9 @@
         <activity android:name=".Activities.DashboardActivity" />
         <activity android:name=".Activities.CreateItemListingActivity" />
 
-        <service
-            android:name=".FirebaseServices.MyFirebaseInstanceIDService">
+        <service android:name=".FirebaseServices.MyFirebaseInstanceIDService">
             <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>
         </service>
 
@@ -41,10 +40,9 @@
             android:name="io.fabric.ApiKey"
             android:value="f39a2d28879c79ab5e8d669172317975bdd573e6"
             tools:replace="android:value" />
-
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel"
-            android:value="default_channel_id"/>
+            android:value="default_channel_id" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -56,7 +54,7 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".Activities.EquipmentDetailActivity"></activity>
+        <activity android:name=".Activities.EquipmentDetailActivity" />
     </application>
 
 </manifest>

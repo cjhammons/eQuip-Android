@@ -39,6 +39,7 @@ public class EquipmentDetailActivity extends AppCompatActivity {
 
     private Equipment mEquipment;
     private User mOwner;
+    private boolean mIsOwner = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +55,10 @@ public class EquipmentDetailActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 mEquipment = dataSnapshot.getValue(Equipment.class);
+                if (mEquipment.getOwnerId()
+                        .equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+                    mIsOwner = true;
+                }
                 populateUI();
             }
 
@@ -66,10 +71,15 @@ public class EquipmentDetailActivity extends AppCompatActivity {
     }
 
     void populateUI(){
+        findViewById(R.id.reserved_layout).setVisibility(View.GONE);
         final ImageView image = (ImageView) findViewById(R.id.equipment_picture);
         TextView description = (TextView) findViewById(R.id.equipment_description);
         final TextView email = (TextView) findViewById(R.id.owner_email);
         Button reserveButton = (Button) findViewById(R.id.reserve_button);
+
+        if (mIsOwner) {
+            reserveButton.setVisibility(View.GONE);
+        }
 
         StorageReference storageReference = FirebaseStorage.getInstance().getReference();
         String path = "equipment/" + mEquipment.getKey() + "/0.jpg";
@@ -111,6 +121,29 @@ public class EquipmentDetailActivity extends AppCompatActivity {
         databaseReference.addListenerForSingleValueEvent(userEventListener);
 
         reserveButton.setOnClickListener(new ReserveButtonListener());
+        if (!mEquipment.getAvailable()){
+            reserveButton.setEnabled(false);
+            if (mIsOwner) {
+                findViewById(R.id.reserved_layout).setVisibility(View.VISIBLE);
+                DatabaseReference reserverRef = FirebaseDatabase.getInstance()
+                        .getReference()
+                        .child("users/" + mEquipment.getBorrowerId());
+
+                ValueEventListener listener = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        User borrower = dataSnapshot.getValue(User.class);
+                        ((TextView)findViewById(R.id.reserved_by)).setText(" " + borrower.getEmail());
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                };
+                reserverRef.addListenerForSingleValueEvent(listener);
+            }
+        }
 
 
     }

@@ -88,6 +88,7 @@ public class LoginActivity extends AppCompatActivity {
      * Gets the firebase instanceID tokens of the device and attaches it to the user's
      * database profile. This ID allows for the sending of notifications to the device.
      */
+    @Deprecated
     void addNotificationTokens(){
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users/" + mAuth.getCurrentUser().getUid());
         final String token = FirebaseInstanceId.getInstance().getToken();
@@ -111,7 +112,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void goToDashboard(){
-        addNotificationTokens();
+//        addNotificationTokens();
         Intent intent = new Intent(this, DashboardActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
