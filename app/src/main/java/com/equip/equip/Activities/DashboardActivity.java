@@ -83,6 +83,8 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
         logout.setDrawerCallBack(this);
         DrawerMenuItem myEquipment = new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_MY_EQUIPMENT);
         myEquipment.setDrawerCallBack(this);
+        DrawerMenuItem dashboard = new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_DASHBOARD);
+        dashboard.setDrawerCallBack(this);
         mDrawerView
                 .addView(new DrawerHeader(mUser.getDisplayName(), mUser.getEmail(), mUser.getPhotoUrl()))
 //                .addView(search)
@@ -90,6 +92,7 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
 //                .addView(profile)
 //                .addView(messages)
 //                .addView(settings)
+                .addView(dashboard)
                 .addView(myEquipment)
                 .addView(logout);
         ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.open_drawer, R.string.close_drawer){
@@ -134,6 +137,16 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
     }
 
     @Override
+    public void onDashboardSelected() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, new NearbyListFragment())
+                .addToBackStack("MyEquipment")
+                .commit();
+        mDrawer.closeDrawers();
+    }
+
+    @Override
     public void onMyEquipmentSelected() {
         getSupportFragmentManager()
                 .beginTransaction()
@@ -155,7 +168,6 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
         public void onClick(View v) {
             Intent intent = new Intent(DashboardActivity.this, CreateItemListingActivity.class);
             startActivity(intent);
-
         }
     }
 }

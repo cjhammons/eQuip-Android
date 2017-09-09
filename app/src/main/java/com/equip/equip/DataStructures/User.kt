@@ -17,7 +17,7 @@ class User {
     var googleConnected: Boolean = false
     var facebookConnected: Boolean = false
     var notificationTokens: MutableList<String>? = null
-
+    var isSeller: Boolean = false
 
     constructor(){
         //default
@@ -32,19 +32,28 @@ class User {
     @Exclude
     fun addEquipmentListing(key: String){
         if (equipmentListings == null){
-            equipmentListings = ArrayList<String>()
+            equipmentListings = ArrayList<String>() as MutableList<String>?
         }
         equipmentListings!!.add(key)
     }
 
     @Exclude
     fun addToken(token: String){
-        if (notificationTokens == null){
+        if (token.equals(""))
+            return
+        if (notificationTokens == null)
             notificationTokens = ArrayList<String>()
-        }
         if (notificationTokens!!.contains(token))
             return
         notificationTokens!!.add(token)
+    }
+
+    @Exclude
+    fun removeToken(token: String){
+        if (notificationTokens == null)
+            return
+        if (notificationTokens!!.contains(token))
+            notificationTokens!!.remove(token)
     }
 
     @Exclude
@@ -62,6 +71,7 @@ class User {
         result.put("picUrl", picUrl)
         result.put("googleConnected", googleConnected)
         result.put("facebookConnected", facebookConnected)
+        result.put("isSeller", isSeller)
         return result
     }
 

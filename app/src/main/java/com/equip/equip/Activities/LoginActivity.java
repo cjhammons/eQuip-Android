@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.equip.equip.DataStructures.User;
+import com.equip.equip.FirebaseServices.MyFirebaseInstanceIDService;
 import com.equip.equip.Fragments.LoginFragment;
 import com.equip.equip.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -92,6 +93,7 @@ public class LoginActivity extends AppCompatActivity {
     void addNotificationTokens(){
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users/" + mAuth.getCurrentUser().getUid());
         final String token = FirebaseInstanceId.getInstance().getToken();
+//        final String token = MyFirebaseInstanceIDService.getToken();
         ValueEventListener valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -101,6 +103,7 @@ public class LoginActivity extends AppCompatActivity {
                 Map<String, Object> childUpdates = new HashMap<>();
                 childUpdates.put("users/"+ mAuth.getCurrentUser().getUid(), user.toMap());
                 ref.updateChildren(childUpdates);
+                Log.d(TAG, "Token " + token + " added to " + user.userId);
             }
 
             @Override
@@ -113,6 +116,7 @@ public class LoginActivity extends AppCompatActivity {
 
     public void goToDashboard(){
 //        addNotificationTokens();
+        MyFirebaseInstanceIDService.updateUserTokens();
         Intent intent = new Intent(this, DashboardActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);

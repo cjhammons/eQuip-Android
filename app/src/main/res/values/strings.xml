@@ -31,6 +31,7 @@
     <string name="confirmation_resent">Confirmation has been sent</string>
 
     <!--Dashboard-->
+    <string name="post_your_items">Post Your Items</string>
 
     <!--Drawer Strings-->
     <string name="drawer_search">Search</string>
@@ -42,6 +43,7 @@
     <string name="open_drawer">Drawer Open</string>
     <string name="close_drawer">Drawer Closed</string>
     <string name="my_equipment">My Equipment</string>
+    <string name="drawer_dashboard">Dashboard</string>
 
     <!--Create Listing Activity-->
     <string name="description_title">Description</string>

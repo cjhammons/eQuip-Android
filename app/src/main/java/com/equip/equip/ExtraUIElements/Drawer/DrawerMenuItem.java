@@ -28,6 +28,7 @@ public class DrawerMenuItem {
     public static final int DRAWER_MENU_ITEM_SETTINGS = 5;
     public static final int DRAWER_MENU_ITEM_LOGOUT = 6;
     public static final int DRAWER_MENU_ITEM_MY_EQUIPMENT = 7;
+    public static final int DRAWER_MENU_ITEM_DASHBOARD = 8;
 
     private int mMenuPosition;
     private Context mContext;
@@ -67,6 +68,10 @@ public class DrawerMenuItem {
                 break;
             case DRAWER_MENU_ITEM_MY_EQUIPMENT:
                 itemNameTxt.setText(R.string.my_equipment);
+                break;
+            case DRAWER_MENU_ITEM_DASHBOARD:
+                itemNameTxt.setText(R.string.drawer_dashboard);
+                break;
         }
     }
 
@@ -94,6 +99,9 @@ public class DrawerMenuItem {
             case DRAWER_MENU_ITEM_MY_EQUIPMENT:
                 mCallBack.onMyEquipmentSelected();
                 break;
+            case DRAWER_MENU_ITEM_DASHBOARD:
+                mCallBack.onDashboardSelected();
+                break;
         }
     }
 
@@ -109,5 +117,6 @@ public class DrawerMenuItem {
         void onSettingsSelected();
         void onLogoutSelected();
         void onMyEquipmentSelected();
+        void onDashboardSelected();
     }
 }
