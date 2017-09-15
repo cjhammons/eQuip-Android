@@ -21,8 +21,7 @@ public class MyEquipmentListFragment extends BaseEquipmentListFragment {
     @Override
     public Query getQuery(DatabaseReference databaseReference) {
         String uId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        String query = "user-equipment/" + uId;
-        return databaseReference.child(query);
+        return databaseReference.child("equipment").orderByChild("ownerId").equalTo(uId);
     }
 
 }

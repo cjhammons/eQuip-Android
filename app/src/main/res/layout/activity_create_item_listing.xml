@@ -33,7 +33,8 @@
                 android:id="@+id/add_photo_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_add_a_photo_black_24dp"/>
+                android:src="@drawable/ic_add_a_photo_black_24dp"
+                android:background="@color/colorAccent"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -41,6 +42,18 @@
                 android:text="@string/add_photos"
                 android:textColor="@android:color/black"/>
         </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/name_title"
+            android:textColor="@android:color/black"/>
+
+        <EditText
+            android:id="@+id/equipment_name_entry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/name_title"/>
 
         <TextView
             android:layout_width="match_parent"
@@ -69,7 +82,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:text="@string/create_listing" />
+                android:text="@string/create_listing"
+                android:background="@color/colorAccent"/>
         </RelativeLayout>
 
 

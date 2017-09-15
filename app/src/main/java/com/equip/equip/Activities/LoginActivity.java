@@ -85,40 +85,11 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Gets the firebase instanceID tokens of the device and attaches it to the user's
-     * database profile. This ID allows for the sending of notifications to the device.
-     */
-    @Deprecated
-    void addNotificationTokens(){
-        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users/" + mAuth.getCurrentUser().getUid());
-        final String token = FirebaseInstanceId.getInstance().getToken();
-//        final String token = MyFirebaseInstanceIDService.getToken();
-        ValueEventListener valueEventListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-                user.addToken(token);
-                DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-                Map<String, Object> childUpdates = new HashMap<>();
-                childUpdates.put("users/"+ mAuth.getCurrentUser().getUid(), user.toMap());
-                ref.updateChildren(childUpdates);
-                Log.d(TAG, "Token " + token + " added to " + user.userId);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
-        userRef.addValueEventListener(valueEventListener);
-    }
-
     public void goToDashboard(){
-//        addNotificationTokens();
         MyFirebaseInstanceIDService.updateUserTokens();
         Intent intent = new Intent(this, DashboardActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
+        finish();
     }
 }

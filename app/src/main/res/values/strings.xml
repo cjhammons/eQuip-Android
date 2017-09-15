@@ -53,6 +53,7 @@
     <string name="no_photos">You forgot to add a photo!</string>
     <string name="take_photo">Take Photo</string>
     <string name="add_from_phone">Add from phone</string>
+    <string name="name_title">Name</string>
     <array name="add_photo_options">
         <item>Add From Phone</item>
         <item>Take Photo</item>
@@ -60,9 +61,15 @@
 
     <!--Equipment Detail Activity-->
     <string name="contact_info">Contact Information</string>
-    <string name="reserve_button">Reserve</string>
+    <string name="reserve_button">Reserve Item</string>
     <string name="reserved">The owner has been notified of your reservation</string>
     <string name="reserved_by">Reserved by</string>
+    <string name="make_reservation_button">Make Reservation</string>
+    <string name="available">Available</string>
+    <string name="not_available">Not Available</string>
+
+    <!--menu items-->
+    <string name="menu_back">back</string>
 
 
     <!-- TODO: Remove or change this placeholder text -->

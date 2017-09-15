@@ -5,10 +5,9 @@ import com.google.firebase.database.Query;
 
 
 public class NearbyListFragment extends BaseEquipmentListFragment {
-
+    //todo order by location or something idk
     @Override
     public Query getQuery(DatabaseReference databaseReference) {
-        //TODO filter by location or something
-        return databaseReference.child("equipment");
+        return databaseReference.child("equipment").orderByChild("available").equalTo(true);
     }
 }

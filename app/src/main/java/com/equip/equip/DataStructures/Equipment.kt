@@ -15,20 +15,26 @@ import java.util.HashMap
  */
 @IgnoreExtraProperties
 class Equipment {
-
     lateinit var description: String
     lateinit var ownerId: String
     lateinit var borrowerId: String
     lateinit var category: String
+    var name: String = ""
     var imagePaths: MutableList<String>? = null
     var available: Boolean = false
     lateinit var key: String
+    lateinit var title: String
 
     constructor() {
         //Default
     }
 
-    constructor(description: String, ownerId: String, borrowerId: String, category: String, imagePaths: MutableList<String>?, available: Boolean) {
+    constructor(description: String, ownerId: String,
+                borrowerId: String, category: String,
+                imagePaths: MutableList<String>?, available: Boolean,
+                name: String) {
+
+        //todo add title
         this.description = description
         this.ownerId = ownerId
         this.borrowerId = borrowerId
@@ -36,6 +42,7 @@ class Equipment {
         this.imagePaths = imagePaths
         this.available = available
         this.key = ""
+        this.name = name
     }
 
     @Exclude
@@ -79,6 +86,7 @@ class Equipment {
             result.put("imagePaths", imagePaths!!)
         }
         result.put("available", available)
+        result.put("name", name)
         return result
     }
 

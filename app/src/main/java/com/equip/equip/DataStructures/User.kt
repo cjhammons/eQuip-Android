@@ -12,12 +12,18 @@ class User {
     lateinit var userId: String
     lateinit var email: String
     lateinit var displayName: String
-    var equipmentListings: MutableList<String>? = null
     var picUrl: String = ""
     var googleConnected: Boolean = false
     var facebookConnected: Boolean = false
-    var notificationTokens: MutableList<String>? = null
-    var isSeller: Boolean = false
+    var notificationTokens: MutableList<String>? = ArrayList<String>()
+    var isVendor: Boolean = false
+    var reservationIds: MutableList<String> = ArrayList<String>()
+
+    //Seller only
+    var ownedReservationIds: MutableList<String> = ArrayList<String>()
+    var equipmentPresets: MutableList<EquipmentPreset> = ArrayList<EquipmentPreset>()
+    var equipmentListings: MutableList<String>? = ArrayList<String>()
+    var address: String = ""
 
     constructor(){
         //default
@@ -29,12 +35,63 @@ class User {
         this.displayName = displayName
     }
 
+    //seller constructur
+    constructor(uId: String, email: String, displayName: String, address: String){
+        this.userId = uId
+        this.email = email
+        this.displayName = displayName
+        this.address = address
+        this.isVendor = true
+    }
+
+    @Exclude
+    fun addReservation(reservationId: String){
+        if (reservationId.equals(""))
+            return
+        reservationIds.add(reservationId)
+    }
+
+    @Exclude
+    fun removeReservation(reservationId: String) {
+        if (reservationId.equals(""))
+            return
+        reservationIds.remove(reservationId)
+    }
+
+    @Exclude
+    fun addOwnedReservation(reservationId: String){
+        if (!isVendor)
+            return
+        if (reservationId.equals(""))
+            return
+        ownedReservationIds.add(reservationId)
+    }
+
+    @Exclude
+    fun removeOwnedReservation(reservationId: String) {
+        if (!isVendor)
+            return
+        if (reservationId.equals(""))
+            return
+        ownedReservationIds.remove(reservationId)
+    }
+
     @Exclude
     fun addEquipmentListing(key: String){
+        if (!isVendor)
+            return
         if (equipmentListings == null){
             equipmentListings = ArrayList<String>() as MutableList<String>?
         }
         equipmentListings!!.add(key)
+    }
+
+    @Exclude
+    fun removeEquipmentListing(key: String) {
+        if (!isVendor)
+            return
+        if (equipmentListings!!.contains(key))
+            equipmentListings!!.remove(key)
     }
 
     @Exclude
@@ -62,16 +119,16 @@ class User {
         result.put("userId", userId)
         result.put("email", email)
         result.put("displayName", displayName)
-        if (equipmentListings != null) {
-            result.put("equipmentListings", equipmentListings!!)
-        }
-        if (notificationTokens != null){
-            result.put("notificationTokens", notificationTokens!!)
-        }
+        result.put("equipmentListings", equipmentListings!!)
+        result.put("notificationTokens", notificationTokens!!)
+        result.put("reservationIds", reservationIds)
+        result.put("ownedReservationIds", ownedReservationIds)
         result.put("picUrl", picUrl)
         result.put("googleConnected", googleConnected)
         result.put("facebookConnected", facebookConnected)
-        result.put("isSeller", isSeller)
+        result.put("isVendor", isVendor)
+        result.put("equipmentPresets", equipmentPresets)
+        result.put("address", address)
         return result
     }
 

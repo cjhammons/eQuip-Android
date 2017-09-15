@@ -27,6 +27,8 @@ import com.mindorks.placeholderview.PlaceHolderView;
 import java.util.HashMap;
 import java.util.Map;
 
+import ru.dimorinny.floatingtextbutton.FloatingTextButton;
+
 public class DashboardActivity extends AppCompatActivity implements DrawerMenuItem.DrawerCallBack{
 
     public static final String TAG = "DashboardActivity";
@@ -36,7 +38,9 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
     private Toolbar mToolbar;
     private PlaceHolderView mGalleryView;
     private FirebaseUser mUser;
-    private FloatingActionButton mFab;
+//    private FloatingActionButton mFab;
+    private FloatingTextButton mFab;
+
     //TODO finish tab thing?
     private ViewPager mViewPager;
     private TabLayout mTabLayout;
@@ -51,7 +55,8 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
 
         mToolbar = (Toolbar)findViewById(R.id.toolbar);
 
-        mFab = (FloatingActionButton) findViewById(R.id.fab_add);
+//        mFab = (FloatingActionButton) findViewById(R.id.fab_add);
+        mFab = (FloatingTextButton) findViewById(R.id.fab_add);
         mFab.setOnClickListener(new FabListener());
 
 //        mViewPager = (ViewPager) findViewById(R.id.tab_pager);

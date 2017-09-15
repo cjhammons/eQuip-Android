@@ -26,6 +26,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.equip.equip.DataStructures.Equipment;
+import com.equip.equip.DataStructures.User;
 import com.equip.equip.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -52,6 +53,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 
 /**
@@ -60,10 +62,13 @@ import java.util.Map;
 //TODO location tagging
 public class CreateItemListingActivity extends Activity {
 
+    public static final String TAG = "CreateListing";
+
     private EditText mDescriptionText;
     private Spinner mCategorySpinner;
     private ImageButton mAddPhotoButton;
     private Button mCreateListingButton;
+    private EditText mNameText;
     //TODO imageview pager probably
     private ImageView imageView;
 
@@ -114,6 +119,7 @@ public class CreateItemListingActivity extends Activity {
             }
         });
         mDescriptionText = (EditText) findViewById(R.id.equipment_description_entry);
+        mNameText = (EditText) findViewById(R.id.equipment_name_entry);
 
         mAddPhotoButton = (ImageButton) findViewById(R.id.add_photo_button);
         mAddPhotoButton.setOnClickListener(new View.OnClickListener() {
@@ -250,7 +256,6 @@ public class CreateItemListingActivity extends Activity {
 
         @Override
         public void onClick(View v) {
-            //TODO upload new listing to db
             if (mPhotoStreams.size() < 1){
                 Toast.makeText(CreateItemListingActivity.this, getString(R.string.no_photos), Toast.LENGTH_SHORT).show();
                 return;
@@ -261,7 +266,8 @@ public class CreateItemListingActivity extends Activity {
                     "",
                     mCategorySpinner.getSelectedItem().toString(),
                     null,
-                    true);
+                    true,
+                    mNameText.getText().toString());
             mKey = mDatabase.child("equipment").push().getKey();
             mEquipment.addKey(mKey);
             updateItemInDatabase();
@@ -290,12 +296,28 @@ public class CreateItemListingActivity extends Activity {
             final Map<String, Object> childUpdates = new HashMap<>();
             childUpdates.put("/equipment/" + mKey, equipmentValues);
 
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            childUpdates.put("/user-equipment/"
-                    + user.getUid() + "/"
-                    + mKey,
-                    equipmentValues);
-            mDatabase.updateChildren(childUpdates);
+            final DatabaseReference userReference = mDatabase.getDatabase().getReference()
+                    .child("users/" + mUser.getUid());
+            final ValueEventListener listener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    User user = dataSnapshot.getValue(User.class);
+                    user.addEquipmentListing(mKey);
+                    List<String> userEquipment = user.getEquipmentListings();
+                    Map<String, Object> childUpdates = new HashMap<>();
+                    childUpdates.put("users/"
+                            + user.getUserId() + "/equipmentListings",
+                            userEquipment);
+                    mDatabase.updateChildren(childUpdates);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.e(TAG, databaseError.getMessage());
+                }
+            };
+
+            userReference.addListenerForSingleValueEvent(listener);
         }
     }
 
