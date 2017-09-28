@@ -4,28 +4,21 @@ import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
-import com.equip.equip.DataStructures.Equipment;
-import com.equip.equip.DataStructures.User;
 import com.equip.equip.ExtraUIElements.Drawer.DrawerHeader;
 import com.equip.equip.ExtraUIElements.Drawer.DrawerMenuItem;
 import com.equip.equip.Fragments.EquipmentListFragments.MyEquipmentListFragment;
 import com.equip.equip.Fragments.EquipmentListFragments.NearbyListFragment;
+import com.equip.equip.Fragments.MyRentalsFragment;
 import com.equip.equip.R;
-import com.github.clans.fab.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
 import com.mindorks.placeholderview.PlaceHolderView;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import ru.dimorinny.floatingtextbutton.FloatingTextButton;
 
@@ -54,7 +47,8 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
         mDrawerView = (PlaceHolderView)findViewById(R.id.drawerView);
 
         mToolbar = (Toolbar)findViewById(R.id.toolbar);
-
+        mToolbar.setTitle(getString(R.string.app_name));
+        setSupportActionBar(mToolbar);
 //        mFab = (FloatingActionButton) findViewById(R.id.fab_add);
         mFab = (FloatingTextButton) findViewById(R.id.fab_add);
         mFab.setOnClickListener(new FabListener());
@@ -70,6 +64,7 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
                 .replace(R.id.fragment_container, new NearbyListFragment())
                 .addToBackStack("Nearby")
                 .commit();
+//        getSupportActionBar().setTitle(getString(R.string.app_name));
         setupDrawer();
     }
 
@@ -93,12 +88,12 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
         mDrawerView
                 .addView(new DrawerHeader(mUser.getDisplayName(), mUser.getEmail(), mUser.getPhotoUrl()))
 //                .addView(search)
-//                .addView(rentals)
 //                .addView(profile)
 //                .addView(messages)
-//                .addView(settings)
                 .addView(dashboard)
+                .addView(rentals)
                 .addView(myEquipment)
+//                .addView(settings)
                 .addView(logout);
         ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.open_drawer, R.string.close_drawer){
             @Override
@@ -123,7 +118,15 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
 
     @Override
     public void onMyRentalsSelected() {
-        //todo
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, new MyRentalsFragment())
+                .addToBackStack("MyRentals")
+                .commit();
+        getSupportActionBar().setTitle(getString(R.string.drawer_my_rentals));
+        mDrawer.closeDrawers();
+        mFab.setVisibility(View.GONE);
+
     }
 
     @Override
@@ -146,9 +149,11 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment_container, new NearbyListFragment())
-                .addToBackStack("MyEquipment")
+                .addToBackStack("Dashboard")
                 .commit();
+        getSupportActionBar().setTitle(getString(R.string.app_name));
         mDrawer.closeDrawers();
+        mFab.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -158,7 +163,9 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
                 .replace(R.id.fragment_container, new MyEquipmentListFragment())
                 .addToBackStack("MyEquipment")
                 .commit();
+        getSupportActionBar().setTitle(getString(R.string.my_equipment));
         mDrawer.closeDrawers();
+        mFab.setVisibility(View.VISIBLE);
     }
 
     @Override

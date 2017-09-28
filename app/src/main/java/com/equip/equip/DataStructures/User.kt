@@ -19,7 +19,7 @@ class User {
     var isVendor: Boolean = false
     var reservationIds: MutableList<String> = ArrayList<String>()
 
-    //Seller only
+    //Vendor only
     var ownedReservationIds: MutableList<String> = ArrayList<String>()
     var equipmentPresets: MutableList<EquipmentPreset> = ArrayList<EquipmentPreset>()
     var equipmentListings: MutableList<String>? = ArrayList<String>()

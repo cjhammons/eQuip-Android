@@ -71,6 +71,10 @@
     <!--menu items-->
     <string name="menu_back">back</string>
 
+    <!--My Rentals-->
+    <string name="current_rentals_title">Current</string>
+    <string name="history_rentals_title">History</string>
+
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

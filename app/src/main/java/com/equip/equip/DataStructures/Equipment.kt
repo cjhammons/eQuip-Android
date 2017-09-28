@@ -24,6 +24,7 @@ class Equipment {
     var available: Boolean = false
     lateinit var key: String
     lateinit var title: String
+    lateinit var dueDate: String
 
     constructor() {
         //Default
@@ -35,6 +36,7 @@ class Equipment {
                 name: String) {
 
         //todo add title
+        //todo add due date
         this.description = description
         this.ownerId = ownerId
         this.borrowerId = borrowerId
@@ -87,6 +89,8 @@ class Equipment {
         }
         result.put("available", available)
         result.put("name", name)
+        //todo title
+        //todo due date
         return result
     }
 

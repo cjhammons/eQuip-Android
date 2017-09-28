@@ -4,12 +4,14 @@
     android:layout_height="?attr/actionBarSize"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/colorPrimaryDark"
-    app:theme="@style/MaterialDrawer.DrawerArrowStyle">
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="96dp"
-        android:textColor="@color/white"
-        android:gravity="left|center"
-        android:layout_gravity="center"
-        android:textSize="18sp" />
+    app:theme="@style/MaterialDrawer.DrawerArrowStyle"
+    app:title="@string/app_name"
+    app:titleTextColor="@color/white">
+    <!--<TextView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="96dp"-->
+        <!--android:textColor="@color/white"-->
+        <!--android:gravity="left|center"-->
+        <!--android:layout_gravity="center"-->
+        <!--android:textSize="18sp" />-->
 </android.support.v7.widget.Toolbar>
