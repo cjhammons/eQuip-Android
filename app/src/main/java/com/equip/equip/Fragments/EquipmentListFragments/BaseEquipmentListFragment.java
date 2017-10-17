@@ -80,6 +80,7 @@ public abstract class BaseEquipmentListFragment extends Fragment {
         return view;
     }
 
+    public abstract Fragment getFragmentInstance();
 
     public abstract Query getQuery(DatabaseReference databaseReference);
 
@@ -142,7 +143,6 @@ public abstract class BaseEquipmentListFragment extends Fragment {
         public void onBindViewHolder(final ViewHolder holder, final int position) {
             Log.d(LOG_TAG, "onBindViewHolder (" + position + ")");
             final Equipment equipment = mEquipmentList.get(position);
-            //TODO load equipment detail screen
             holder.mImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -164,6 +164,10 @@ public abstract class BaseEquipmentListFragment extends Fragment {
                     Log.e(LOG_TAG + ": load thumbnail", e.getMessage());
                 }
             });
+
+            if (!equipment.getAvailable() && getFragmentInstance() instanceof MyEquipmentListFragment){
+                holder.mReserveNotification.setVisibility(View.VISIBLE);
+            }
 
 //            if (equipment.getImagePaths() == null) return;
 //            int dimension = 350;
@@ -197,10 +201,12 @@ public abstract class BaseEquipmentListFragment extends Fragment {
 
         class ViewHolder extends RecyclerView.ViewHolder{
             private ImageView mImage;
+            private ImageView mReserveNotification;
 
             private ViewHolder(View itemView) {
                 super(itemView);
                 mImage = (ImageView) itemView.findViewById(R.id.equipment_image);
+                mReserveNotification = (ImageView) itemView.findViewById(R.id.reserve_notification);
             }
         }
     }

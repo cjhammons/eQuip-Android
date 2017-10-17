@@ -1,6 +1,7 @@
 package com.equip.equip.Fragments.EquipmentListFragments;
 
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,4 +25,8 @@ public class MyEquipmentListFragment extends BaseEquipmentListFragment {
         return databaseReference.child("equipment").orderByChild("ownerId").equalTo(uId);
     }
 
+    @Override
+    public Fragment getFragmentInstance() {
+        return MyEquipmentListFragment.this;
+    }
 }

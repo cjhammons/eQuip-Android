@@ -72,11 +72,9 @@
     <string name="make_reservation_button">Make Reservation</string>
     <string name="available">Available</string>
     <string name="not_available">Not Available</string>
-
-    <!--Reserve Fragment-->
-
-
-
+    <string name="equipment_reserved_title">This item has been reserved</string>
+    <string name="confirm_reservation_button">Confirm Reservation</string>
+    <string name="reservation_confirmed_toast">Reservaton Confirmed</string>
     <!--menu items-->
     <string name="menu_back">back</string>
 

@@ -177,7 +177,72 @@
 
             </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/reserved_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/lower_container"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <View
+                    android:id="@+id/divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginBottom="12dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@android:color/darker_gray" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="72dp"
+                    android:layout_marginRight="72dp"
+                    android:orientation="vertical"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp">
+
+                    <TextView
+                        android:id="@+id/reserved_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/equipment_reserved_title"
+                        android:textColor="@color/textDark"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/borrower_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="TextView" />
+
+                    <TextView
+                        android:id="@+id/date_range"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="TextView" />
+
+                    <Button
+                        android:id="@+id/confirm_reservation_button"
+                        android:layout_width="match_parent"
+                        android:layout_height="36dp"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="64dp"
+                        android:layout_marginRight="64dp"
+                        android:background="@drawable/curved_button"
+                        android:backgroundTint="@color/colorAccentDark"
+                        android:text="@string/confirm_reservation_button"
+                        android:textColor="@color/white"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
             <Space
+                android:id="@+id/resesrvation_title"
                 android:layout_width="match_parent"
                 android:layout_height="72dp"
                 android:layout_below="@+id/lower_container" />

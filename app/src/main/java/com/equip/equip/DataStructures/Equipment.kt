@@ -24,6 +24,7 @@ class Equipment {
     var available: Boolean = false
     lateinit var key: String
     lateinit var dueDate: String
+    var reservationId: String = ""
 
     constructor() {
         //Default
@@ -87,7 +88,7 @@ class Equipment {
         }
         result.put("available", available)
         result.put("name", name)
-        //todo title
+        result.put("reservationId", reservationId)
         //todo due date
         return result
     }

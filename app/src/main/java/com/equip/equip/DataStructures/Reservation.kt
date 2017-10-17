@@ -12,26 +12,35 @@ class Reservation {
     lateinit var equipmentId: String
     lateinit var ownerId: String
     lateinit var borrowerId: String
+    var key: String = ""
     var dateTimeReserved: String = ""
-    var reservePeriodStartDate: String = ""
-    var reservePeriodEndDate: String = ""
+    var reservedPeriodStartDate: String = ""
+    var reservedPeriodEndDate: String = ""
     var confirmedByOwner: Boolean = false
     var dateTimeConfirmed: String = ""
+
 
     constructor(){
         //default
     }
 
     constructor(equipmentId: String, ownerId: String, borrowerId: String,
-                startDate: String, endDate: String, timeReserved: String){
+                startDate: String, endDate: String, timeReserved: String,
+                key: String){
         this.equipmentId = equipmentId
         this.ownerId = ownerId
         this.borrowerId = borrowerId
-        this.reservePeriodStartDate = startDate
-        this.reservePeriodEndDate = endDate
+        this.reservedPeriodStartDate = startDate
+        this.reservedPeriodEndDate = endDate
         this.dateTimeReserved = timeReserved
+        this.key = key
     }
 
+    @Exclude
+    fun setConfirmed(dateTimeConfirmed: String) {
+        confirmedByOwner = true
+        this.dateTimeConfirmed = dateTimeConfirmed
+    }
 
     @Exclude
     fun toMap(): Map<String, Any> {
@@ -40,8 +49,8 @@ class Reservation {
         result.put("ownerId", ownerId)
         result.put("borrowerId", borrowerId)
         result.put("dateTimeReserved", dateTimeReserved)
-        result.put("reservedPeriodStartDate", reservePeriodStartDate)
-        result.put("reservedPeriodEndDate", reservePeriodEndDate)
+        result.put("reservedPeriodStartDate", reservedPeriodStartDate)
+        result.put("reservedPeriodEndDate", reservedPeriodEndDate)
         result.put("confirmedByOwner", confirmedByOwner)
         result.put("dateTimeConfirmed", dateTimeConfirmed)
         return result

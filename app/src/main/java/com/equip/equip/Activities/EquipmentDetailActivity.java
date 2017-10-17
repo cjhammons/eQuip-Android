@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,6 +48,8 @@ public class EquipmentDetailActivity extends AppCompatActivity implements DatePi
     private Equipment mEquipment;
     private User mOwner;
     private boolean mIsOwner = false;
+
+    Reservation mReservation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,28 +157,69 @@ public class EquipmentDetailActivity extends AppCompatActivity implements DatePi
             reserveButton.setEnabled(false);
             reserveButton.setVisibility(View.GONE);
             if (mIsOwner) {
-//                findViewById(R.id.reserved_layout).setVisibility(View.VISIBLE);
-//                DatabaseReference reserverRef = FirebaseDatabase.getInstance()
-//                        .getReference()
-//                        .child("users/" + mEquipment.getBorrowerId());
-//
-//                ValueEventListener listener = new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(DataSnapshot dataSnapshot) {
-//                        User borrower = dataSnapshot.getValue(User.class);
-//                        ((TextView)findViewById(R.id.reserved_by)).setText(" " + borrower.getEmail());
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(DatabaseError databaseError) {
-//
-//                    }
-//                };
-//                reserverRef.addListenerForSingleValueEvent(listener);
+                populateReservationInfo();
             }
         } else {
             availableText.setText(getString(R.string.available).toUpperCase());
         }
+    }
+
+    //Only called when the user owns the item and the item has been reserved
+    void populateReservationInfo(){
+        findViewById(R.id.reserved_container).setVisibility(View.VISIBLE);
+
+        DatabaseReference reservationRef = FirebaseDatabase.getInstance()
+                .getReference()
+                .child("reservations/" + mEquipment.getReservationId());
+
+        ValueEventListener reservationListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Reservation reservation = dataSnapshot.getValue(Reservation.class);
+                mReservation = reservation;
+
+                //date stuff
+                SimpleDateFormat df = new SimpleDateFormat("MM/dd/YYYY");
+                df.applyPattern("MM/dd/yyyy");
+                Date startDate = null;
+                Date endDate = null;
+                try {
+                    startDate = df.parse(reservation.getReservedPeriodStartDate());
+                    endDate = df.parse(reservation.getReservedPeriodEndDate());
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+
+                String combinedDateString = df.format(startDate) + " - " + df.format(endDate);
+
+                ((TextView)findViewById(R.id.date_range)).setText(combinedDateString);
+
+                //get borrower information
+                DatabaseReference borrowerRef = FirebaseDatabase.getInstance()
+                        .getReference()
+                        .child("users/" + reservation.getBorrowerId());
+                ValueEventListener borrowerListener = new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        User borrower = dataSnapshot.getValue(User.class);
+                        //todo use displayname instead of email
+                        ((TextView)findViewById(R.id.borrower_name)).setText(borrower.getEmail());
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                };
+                borrowerRef.addListenerForSingleValueEvent(borrowerListener);
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        };
+        reservationRef.addListenerForSingleValueEvent(reservationListener);
+
+        Button confirmReservationButton = (Button) findViewById(R.id.confirm_reservation_button);
+        confirmReservationButton.setOnClickListener(new ConfirmReservationButtonListener());
     }
 
 
@@ -183,28 +227,27 @@ public class EquipmentDetailActivity extends AppCompatActivity implements DatePi
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         String dateTimeReserved = SimpleDateFormat.getDateTimeInstance().format(new Date()).toString();
+        String reservationKey = databaseReference.child("reservations/").push().getKey();
         Reservation reservation = new Reservation(
                 mEquipment.getKey(),
                 mEquipment.getOwnerId(),
                 user.getUid(),
                 startDate,
                 endDate,
-                dateTimeReserved
+                dateTimeReserved,
+                reservationKey
         );
-
         mEquipment.setAvailable(false);
-        String key = databaseReference.child("reservations/").push().getKey();
+        mEquipment.setReservationId(reservationKey);
 
         Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/reservations/" + key, reservation.toMap());
+        childUpdates.put("/reservations/" + reservationKey, reservation.toMap());
         childUpdates.put("/equipment/" + mEquipment.getKey(), mEquipment.toMap());
 
         databaseReference.updateChildren(childUpdates);
         Toast.makeText(EquipmentDetailActivity.this, R.string.reserved, Toast.LENGTH_SHORT).show();
         finish();
     }
-
-
 
     private class ReserveButtonListener implements View.OnClickListener {
 
@@ -218,6 +261,27 @@ public class EquipmentDetailActivity extends AppCompatActivity implements DatePi
                     now.get(Calendar.DAY_OF_MONTH)
             );
             datePickerDialog.show(getFragmentManager(), "TimePickerDialog");
+        }
+    }
+
+    private class ConfirmReservationButtonListener implements View.OnClickListener{
+
+        @Override
+        public void onClick(View v) {
+            String dateTimeConfirmed = SimpleDateFormat.getDateTimeInstance().format(new Date()).toString();
+
+            mReservation.setConfirmed(dateTimeConfirmed);
+
+            Map<String, Object> childUpdates = new HashMap<>();
+            String reservationKey = "";
+            if (mReservation.getKey().equals(null) || mReservation.getKey().equals("")){
+                reservationKey = mEquipment.getReservationId();
+            } else {
+                reservationKey = mReservation.getKey();
+            }
+            childUpdates.put("/reservations/" + reservationKey, mReservation.toMap());
+            FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
+            Toast.makeText(EquipmentDetailActivity.this, getString(R.string.reservation_confirmed_toast), Toast.LENGTH_SHORT).show();
         }
     }
 
