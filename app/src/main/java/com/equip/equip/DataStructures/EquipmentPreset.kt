@@ -6,6 +6,7 @@ import com.google.firebase.database.IgnoreExtraProperties
 /**
  * Created by Curtis on 9/7/2017.
  */
+
 @IgnoreExtraProperties
 class EquipmentPreset {
     lateinit var name: String

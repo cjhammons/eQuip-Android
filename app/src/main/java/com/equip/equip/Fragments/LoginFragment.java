@@ -19,9 +19,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 /**
  * Created by curtis on 5/24/17.
@@ -33,6 +30,7 @@ public class LoginFragment extends Fragment {
     EditText emailText;
     EditText passwordText;
     TextView createAccountText;
+    TextView recoverPasswordText;
 
     public static final String TAG = "LoginFragment";
 
@@ -62,9 +60,11 @@ public class LoginFragment extends Fragment {
         emailText           = (EditText) view.findViewById(R.id.email_entry);
         passwordText        = (EditText) view.findViewById(R.id.password_entry);
         createAccountText   = (TextView) view.findViewById(R.id.create_account_text);
+        recoverPasswordText = (TextView) view.findViewById(R.id.recover_password_text);
 
         loginButton.setOnClickListener(new LoginListener(mAuth));
         createAccountText.setOnClickListener(new CreateAccountListener());
+        recoverPasswordText.setOnClickListener(new RecoverPasswordListener());
 
         return view;
     }
@@ -72,9 +72,6 @@ public class LoginFragment extends Fragment {
 
 
     public void goToDashboard(){
-//        Intent intent = new Intent(getActivity(), DashboardActivity.class);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-//        getActivity().startActivity(intent);
         ((LoginActivity)getActivity()).goToDashboard();
     }
 
@@ -92,7 +89,13 @@ public class LoginFragment extends Fragment {
 
         @Override
         public void onClick(View v) {
-            mLoginAuth.signInWithEmailAndPassword(emailText.getText().toString(), passwordText.getText().toString())
+            String email = emailText.getText().toString();
+            String password = passwordText.getText().toString();
+            if (email.equals("") || password.equals("")){
+                Toast.makeText(getContext(), getString(R.string.error_blank_password_email), Toast.LENGTH_SHORT).show();
+                return;
+            }
+            mLoginAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
@@ -102,6 +105,7 @@ public class LoginFragment extends Fragment {
                                 Log.w(TAG, "signInWithEmail:failed", task.getException());
                                 Toast.makeText(getContext(), R.string.login_failed,
                                         Toast.LENGTH_SHORT).show();
+                                //todo specific errors
                             } else {
                                 goToDashboard();
                             }
@@ -122,6 +126,15 @@ public class LoginFragment extends Fragment {
                     .replace(R.id.login_fragment_container, createAccountFragment, CreateAccountFragment.TAG)
                     .addToBackStack(null)
                     .commit();
+        }
+    }
+
+    //todo
+    private class RecoverPasswordListener implements View.OnClickListener{
+
+        @Override
+        public void onClick(View v) {
+
         }
     }
 

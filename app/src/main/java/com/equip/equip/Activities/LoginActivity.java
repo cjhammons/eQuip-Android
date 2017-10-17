@@ -36,7 +36,7 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthListener;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_login);
@@ -52,21 +52,22 @@ public class LoginActivity extends AppCompatActivity {
                 } else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
+                    if (findViewById(R.id.login_fragment_container) != null) {
+
+                        if (savedInstanceState != null) {
+                            return;
+                        }
+                        LoginFragment loginFragment = LoginFragment.getInstance(mAuth);
+
+                        getSupportFragmentManager().beginTransaction()
+                                .add(R.id.login_fragment_container, loginFragment).commit();
+                    }
                 }
             }
         };
 
 
-        if (findViewById(R.id.login_fragment_container) != null) {
 
-            if (savedInstanceState != null) {
-                return;
-            }
-            LoginFragment loginFragment = LoginFragment.getInstance(mAuth);
-
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.login_fragment_container, loginFragment).commit();
-        }
 
 
     }

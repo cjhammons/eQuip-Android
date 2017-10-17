@@ -174,17 +174,24 @@
                         tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec ut tellus augue. Sed aliquam purus quam, venenatis iaculis neque commodo sed. Nullam vitae mauris arcu. Donec scelerisque nec dolor eget tempor. Suspendisse justo massa, elementum sed eleifend eu, sodales quis mauris. Integer interdum, ipsum sit amet bibendum iaculis, neque lectus tincidunt dolor, quis finibus mi enim fermentum risus. Nullam maximus quam vitae quam consequat fermentum." />
 
                 </LinearLayout>
+
             </LinearLayout>
 
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_below="@+id/lower_container" />
 
         </RelativeLayout>
     </ScrollView>
+
+
 
     <ru.dimorinny.floatingtextbutton.FloatingTextButton
         android:id="@+id/reserve_item_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:floating_background_color="@color/colorAccent"
+        app:floating_background_color="@color/colorAccentDark"
         app:floating_title="@string/reserve_button"
         app:floating_title_color="@color/white"
         android:layout_alignParentBottom="true"

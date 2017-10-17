@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -39,6 +40,7 @@ public class CreateAccountFragment extends Fragment {
     EditText passwordText;
     EditText confirmPasswordText;
     Button createAccountButton;
+    TextView returnToLogin;
 
     FirebaseAuth mAuth;
 
@@ -69,6 +71,14 @@ public class CreateAccountFragment extends Fragment {
         passwordText        = (EditText) view.findViewById(R.id.password_entry);
         confirmPasswordText = (EditText) view.findViewById(R.id.confirm_password_entry);
         createAccountButton = (Button)   view.findViewById(R.id.create_account_button);
+
+        returnToLogin       = (TextView) view.findViewById(R.id.return_to_login);
+        returnToLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().onBackPressed();
+            }
+        });
 
         createAccountButton.setOnClickListener(new CreateAccountListener());
 

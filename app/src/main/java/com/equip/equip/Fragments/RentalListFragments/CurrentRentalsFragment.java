@@ -3,6 +3,7 @@ package com.equip.equip.Fragments.RentalListFragments;
 import android.support.v4.app.Fragment;
 
 import com.equip.equip.R;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 
 /**
@@ -12,7 +13,7 @@ import com.google.firebase.database.Query;
 public class CurrentRentalsFragment extends BaseRentalFragment {
 
     @Override
-    public Query getRentalQuery() {
+    public Query getRentalQuery(DatabaseReference databaseReference) {
         return null;
     }
 

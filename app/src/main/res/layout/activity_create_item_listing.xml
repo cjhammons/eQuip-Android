@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:weightSum="1">
@@ -10,85 +11,80 @@
 
 
     <LinearLayout
+        android:layout_below="@id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_marginLeft="12dp"
         android:layout_marginRight="12dp">
 
-        <ImageView
-            android:id="@+id/image_view"
-            android:layout_width="match_parent"
-            android:layout_height="203dp"
-            android:src="@drawable/ic_image_black_48dp" />
-
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_marginTop="12dp"
             android:layout_marginBottom="12dp">
 
-            <ImageButton
-                android:id="@+id/add_photo_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_add_a_photo_black_24dp"
-                android:background="@color/colorAccent"/>
+            <ImageView
+                android:id="@+id/image_view"
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:layout_alignParentLeft="true"
+                android:src="@drawable/ic_image_black_48dp" />
 
-            <TextView
-                android:layout_width="wrap_content"
+            <EditText
+                android:id="@+id/equipment_name_entry"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/add_photos"
-                android:textColor="@android:color/black"/>
-        </LinearLayout>
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/image_view"
+                android:background="@android:color/transparent"
+                android:hint="@string/title_hint" />
+
+        </RelativeLayout>
 
         <TextView
+            android:id="@+id/textView4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/name_title"
-            android:textColor="@android:color/black"/>
+            android:text="@string/classification_title"
+            android:textColor="@android:color/black" />
 
-        <EditText
-            android:id="@+id/equipment_name_entry"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/name_title"/>
+        <Spinner
+            android:id="@+id/category_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
         <TextView
+            android:id="@+id/textView3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/description_title"
-            android:textColor="@android:color/black"/>
+            android:textColor="@android:color/black" />
 
         <EditText
             android:id="@+id/equipment_description_entry"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/description_title"/>
-
-        <Spinner
-            android:id="@+id/category_spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:background="@android:color/transparent"
+            android:hint="@string/description_hint" />
 
 
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <Button
-                android:id="@+id/create_listing_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:text="@string/create_listing"
-                android:background="@color/colorAccent"/>
-        </RelativeLayout>
 
 
     </LinearLayout>
+    <ru.dimorinny.floatingtextbutton.FloatingTextButton
+        android:id="@+id/create_listing_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:floating_background_color="@color/colorAccentDark"
+        app:floating_title="@string/list_item_button"
+        app:floating_title_color="@color/white"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:elevation="8dp"
+        />
 
 
-
-</LinearLayout>
+</RelativeLayout>

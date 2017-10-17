@@ -23,7 +23,6 @@ class Equipment {
     var imagePaths: MutableList<String>? = null
     var available: Boolean = false
     lateinit var key: String
-    lateinit var title: String
     lateinit var dueDate: String
 
     constructor() {
@@ -35,7 +34,6 @@ class Equipment {
                 imagePaths: MutableList<String>?, available: Boolean,
                 name: String) {
 
-        //todo add title
         //todo add due date
         this.description = description
         this.ownerId = ownerId

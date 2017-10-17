@@ -58,7 +58,7 @@ public class MyRentalsFragment extends Fragment {
         private final List<Fragment> mFragmentList = new ArrayList<>();
         private final List<String> mFragmentTitleList = new ArrayList<>();
 
-        public ViewPagerAdapter(FragmentManager fm) {
+        ViewPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
@@ -72,13 +72,11 @@ public class MyRentalsFragment extends Fragment {
             return mFragmentList.size();
         }
 
-        public void addFragment(Fragment fragment, String fragmentTitle){
+        void addFragment(Fragment fragment, String fragmentTitle){
             if (fragment instanceof BaseRentalFragment) {
                 mFragmentList.add(fragment);
                 mFragmentTitleList.add(fragmentTitle);
             }
-
-
         }
 
         @Override

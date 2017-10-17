@@ -12,12 +12,14 @@ class User {
     lateinit var userId: String
     lateinit var email: String
     lateinit var displayName: String
-    var picUrl: String = ""
+    lateinit var picUrl: String
     var googleConnected: Boolean = false
     var facebookConnected: Boolean = false
     var notificationTokens: MutableList<String>? = ArrayList<String>()
     var isVendor: Boolean = false
     var reservationIds: MutableList<String> = ArrayList<String>()
+    var rentalIds: MutableList<String> = ArrayList<String>()
+    var historicRentalIds: MutableList<String> = ArrayList<String>()
 
     //Vendor only
     var ownedReservationIds: MutableList<String> = ArrayList<String>()
@@ -78,8 +80,6 @@ class User {
 
     @Exclude
     fun addEquipmentListing(key: String){
-        if (!isVendor)
-            return
         if (equipmentListings == null){
             equipmentListings = ArrayList<String>() as MutableList<String>?
         }
@@ -88,8 +88,6 @@ class User {
 
     @Exclude
     fun removeEquipmentListing(key: String) {
-        if (!isVendor)
-            return
         if (equipmentListings!!.contains(key))
             equipmentListings!!.remove(key)
     }
@@ -129,6 +127,8 @@ class User {
         result.put("isVendor", isVendor)
         result.put("equipmentPresets", equipmentPresets)
         result.put("address", address)
+        result.put("rentalIds", rentalIds)
+        result.put("historicRentalIds", historicRentalIds)
         return result
     }
 

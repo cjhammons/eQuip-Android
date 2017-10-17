@@ -55,6 +55,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import ru.dimorinny.floatingtextbutton.FloatingTextButton;
+
 
 /**
  * Created by curtis on 7/19/17.
@@ -66,10 +68,7 @@ public class CreateItemListingActivity extends Activity {
 
     private EditText mDescriptionText;
     private Spinner mCategorySpinner;
-    private ImageButton mAddPhotoButton;
-    private Button mCreateListingButton;
     private EditText mNameText;
-    //TODO imageview pager probably
     private ImageView imageView;
 
     private List<String> mSpinnerList;
@@ -114,25 +113,21 @@ public class CreateItemListingActivity extends Activity {
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
+            public void onCancelled(DatabaseError databaseError) {}
         });
         mDescriptionText = (EditText) findViewById(R.id.equipment_description_entry);
         mNameText = (EditText) findViewById(R.id.equipment_name_entry);
 
-        mAddPhotoButton = (ImageButton) findViewById(R.id.add_photo_button);
-        mAddPhotoButton.setOnClickListener(new View.OnClickListener() {
+        imageView = (ImageView) findViewById(R.id.image_view);
+        imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 new AddPhotoDialogFragment().show(getFragmentManager(), "addPhotoDialog");
             }
         });
 
-        mCreateListingButton = (Button) findViewById(R.id.create_listing_button);
-        mCreateListingButton.setOnClickListener(new CreateListingListener());
-
-        imageView = (ImageView) findViewById(R.id.image_view);
+        FloatingTextButton createListingButton = (FloatingTextButton) findViewById(R.id.create_listing_button);
+        createListingButton.setOnClickListener(new CreateListingListener());
 
     }
 
@@ -295,7 +290,6 @@ public class CreateItemListingActivity extends Activity {
             Map<String, Object> equipmentValues = mEquipment.toMap();
             final Map<String, Object> childUpdates = new HashMap<>();
             childUpdates.put("/equipment/" + mKey, equipmentValues);
-
             final DatabaseReference userReference = mDatabase.getDatabase().getReference()
                     .child("users/" + mUser.getUid());
             final ValueEventListener listener = new ValueEventListener() {
@@ -304,7 +298,6 @@ public class CreateItemListingActivity extends Activity {
                     User user = dataSnapshot.getValue(User.class);
                     user.addEquipmentListing(mKey);
                     List<String> userEquipment = user.getEquipmentListings();
-                    Map<String, Object> childUpdates = new HashMap<>();
                     childUpdates.put("users/"
                             + user.getUserId() + "/equipmentListings",
                             userEquipment);

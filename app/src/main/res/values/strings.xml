@@ -2,21 +2,24 @@
     <string name="app_name">eQuip</string>
 
     <!--Login Fragment-->
-    <string name="email_hint">email</string>
-    <string name="password_hint">password</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Password</string>
     <string name="create_account">Create Account</string>
     <string name="login">Login</string>
     <string name="login_failed">Login Failed</string>
+    <string name="recover_password">Recover Password</string>
+    <string name="error_blank_password_email">Please enter your email and password</string>
 
     <!-- Create Account Fragment-->
+    <string name="register_title">Register for eQuip!</string>
     <string name="email_title">email</string>
-    <string name="email_signup_hint">you@domain.com</string>
-    <string name="password">Password</string>
+    <string name="email_signup_hint">Enter Email Address</string>
+    <string name="password">Enter Password</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="create_account_button">Create Account</string>
     <string name="toast_passwords_do_not_match">Passwords Do Not Match</string>
     <string name="invalid_email_format">Invalid email format</string>
-
+    <string name="return_to_login">Return to Login Screen</string>
     <!--Confirm Account Fragment-->
     <string name="enter_confirmation_code">Enter confirmation code sent to </string>
     <string name="confirm">Confirm</string>
@@ -47,13 +50,15 @@
 
     <!--Create Listing Activity-->
     <string name="description_title">Description</string>
+    <string name="description_hint">Enter a brief product description</string>
     <string name="add_photos">Add up to 3 photos</string>
     <string name="num_photos_added">Photos added</string>
-    <string name="create_listing">Create Listing</string>
+    <string name="list_item_button">List Item</string>
     <string name="no_photos">You forgot to add a photo!</string>
     <string name="take_photo">Take Photo</string>
     <string name="add_from_phone">Add from phone</string>
-    <string name="name_title">Name</string>
+    <string name="title_hint">Product Name</string>
+    <string name="classification_title">Classification</string>
     <array name="add_photo_options">
         <item>Add From Phone</item>
         <item>Take Photo</item>
@@ -67,6 +72,10 @@
     <string name="make_reservation_button">Make Reservation</string>
     <string name="available">Available</string>
     <string name="not_available">Not Available</string>
+
+    <!--Reserve Fragment-->
+
+
 
     <!--menu items-->
     <string name="menu_back">back</string>

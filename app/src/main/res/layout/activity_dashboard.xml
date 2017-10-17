@@ -36,7 +36,7 @@
             android:id="@+id/fab_add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:floating_background_color="@color/colorAccent"
+            app:floating_background_color="@color/colorAccentDark"
             app:floating_title="@string/post_your_items"
             app:floating_title_color="@color/white"
             android:layout_alignParentBottom="true"

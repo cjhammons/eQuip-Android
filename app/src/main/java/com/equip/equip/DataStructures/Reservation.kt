@@ -13,7 +13,8 @@ class Reservation {
     lateinit var ownerId: String
     lateinit var borrowerId: String
     var dateTimeReserved: String = ""
-    var reservePeriod: String = ""
+    var reservePeriodStartDate: String = ""
+    var reservePeriodEndDate: String = ""
     var confirmedByOwner: Boolean = false
     var dateTimeConfirmed: String = ""
 
@@ -21,16 +22,16 @@ class Reservation {
         //default
     }
 
-    constructor(equipmentId: String, ownerId: String, borrowerId: String){
+    constructor(equipmentId: String, ownerId: String, borrowerId: String,
+                startDate: String, endDate: String, timeReserved: String){
         this.equipmentId = equipmentId
         this.ownerId = ownerId
         this.borrowerId = borrowerId
+        this.reservePeriodStartDate = startDate
+        this.reservePeriodEndDate = endDate
+        this.dateTimeReserved = timeReserved
     }
 
-    @Exclude
-    fun reserve(dateTime: String){
-        this.dateTimeReserved = ""
-    }
 
     @Exclude
     fun toMap(): Map<String, Any> {
@@ -39,7 +40,8 @@ class Reservation {
         result.put("ownerId", ownerId)
         result.put("borrowerId", borrowerId)
         result.put("dateTimeReserved", dateTimeReserved)
-        result.put("reservedPeriod", reservePeriod)
+        result.put("reservedPeriodStartDate", reservePeriodStartDate)
+        result.put("reservedPeriodEndDate", reservePeriodEndDate)
         result.put("confirmedByOwner", confirmedByOwner)
         result.put("dateTimeConfirmed", dateTimeConfirmed)
         return result

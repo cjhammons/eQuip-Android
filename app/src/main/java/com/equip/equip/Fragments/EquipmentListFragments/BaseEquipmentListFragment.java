@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -155,12 +156,7 @@ public abstract class BaseEquipmentListFragment extends Fragment {
             mStorageReference.child(path).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(Uri uri) {
-                    int dimension = 350;
-                    Picasso.with(getActivity())
-                            .load(uri)
-                            .resize(dimension, dimension)
-                            .centerCrop()
-                            .into(holder.mImage);
+                    loadImage(holder, uri);
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -176,6 +172,22 @@ public abstract class BaseEquipmentListFragment extends Fragment {
 //                    .resize(dimension, dimension)
 //                    .centerCrop()
 //                    .into(holder.mImage);
+        }
+
+        /**
+         * Loads the image using picasso
+         * @param holder
+         * @param uri
+         */
+        void loadImage(ViewHolder holder, Uri uri){
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+            int dimension = (displayMetrics.widthPixels / 3);
+            Picasso.with(getActivity())
+                    .load(uri)
+                    .resize(dimension, dimension)
+                    .centerCrop()
+                    .into(holder.mImage);
         }
 
         @Override
