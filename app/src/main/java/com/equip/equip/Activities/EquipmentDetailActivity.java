@@ -268,11 +268,12 @@ public class EquipmentDetailActivity extends AppCompatActivity implements DatePi
 
         @Override
         public void onClick(View v) {
+            final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+
+            final Map<String, Object> childUpdates = new HashMap<>();
+
             String dateTimeConfirmed = SimpleDateFormat.getDateTimeInstance().format(new Date()).toString();
-
             mReservation.setConfirmed(dateTimeConfirmed);
-
-            Map<String, Object> childUpdates = new HashMap<>();
             String reservationKey = "";
             if (mReservation.getKey().equals(null) || mReservation.getKey().equals("")){
                 reservationKey = mEquipment.getReservationId();
@@ -280,7 +281,31 @@ public class EquipmentDetailActivity extends AppCompatActivity implements DatePi
                 reservationKey = mReservation.getKey();
             }
             childUpdates.put("/reservations/" + reservationKey, mReservation.toMap());
-            FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
+
+            //update due date in equipment
+            mEquipment.setDueDate(mReservation.getReservedPeriodEndDate());
+            childUpdates.put("/equipment/" + mEquipment.key, mEquipment.toMap());
+
+//            DatabaseReference renterReference = databaseReference.child("/users/" + mReservation.getBorrowerId());
+//            ValueEventListener renterValueListener = new ValueEventListener() {
+//                @Override
+//                public void onDataChange(DataSnapshot dataSnapshot) {
+//                    User renter = dataSnapshot.getValue(User.class);
+//                    renter.addRentalId(mReservation.getEquipmentId());
+//
+//                    childUpdates.put("/users/" + renter.getUserId(), renter.toMap());
+//
+//
+//                }
+//
+//                @Override
+//                public void onCancelled(DatabaseError databaseError) {
+//
+//                }
+//            };
+//            renterReference.addListenerForSingleValueEvent(renterValueListener);
+
+            databaseReference.updateChildren(childUpdates);
             Toast.makeText(EquipmentDetailActivity.this, getString(R.string.reservation_confirmed_toast), Toast.LENGTH_SHORT).show();
         }
     }

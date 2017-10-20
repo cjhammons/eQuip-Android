@@ -37,13 +37,25 @@ class User {
         this.displayName = displayName
     }
 
-    //seller constructur
+    //seller constructor
     constructor(uId: String, email: String, displayName: String, address: String){
         this.userId = uId
         this.email = email
         this.displayName = displayName
         this.address = address
         this.isVendor = true
+    }
+
+    /**
+     * If the user has no set display name, return their email address instead
+     */
+    @Exclude
+    fun muhDisplayName(): String {
+        if (this.displayName.equals("")){
+            return this.email
+        } else {
+           return this.displayName
+        }
     }
 
     @Exclude
@@ -76,6 +88,17 @@ class User {
         if (reservationId.equals(""))
             return
         ownedReservationIds.remove(reservationId)
+    }
+
+    @Exclude
+    fun addRentalId(rentalId: String){
+        if (!rentalIds.contains(rentalId))
+            rentalIds.add(rentalId)
+    }
+
+    fun removeRentalId(rentalId:String) {
+        if (rentalIds.contains(rentalId))
+            rentalIds.remove(rentalId)
     }
 
     @Exclude

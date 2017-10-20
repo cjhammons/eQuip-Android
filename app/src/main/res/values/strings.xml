@@ -81,6 +81,7 @@
     <!--My Rentals-->
     <string name="current_rentals_title">Current</string>
     <string name="history_rentals_title">History</string>
+    <string name="return_button">Return</string>
 
 
     <!-- TODO: Remove or change this placeholder text -->

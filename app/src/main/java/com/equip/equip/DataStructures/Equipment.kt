@@ -23,7 +23,7 @@ class Equipment {
     var imagePaths: MutableList<String>? = null
     var available: Boolean = false
     lateinit var key: String
-    lateinit var dueDate: String
+    var dueDate: String = ""
     var reservationId: String = ""
 
     constructor() {
