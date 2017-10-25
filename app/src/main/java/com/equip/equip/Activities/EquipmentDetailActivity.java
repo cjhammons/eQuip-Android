@@ -179,7 +179,7 @@ public class EquipmentDetailActivity extends AppCompatActivity implements DatePi
                 mReservation = reservation;
 
                 //date stuff
-                SimpleDateFormat df = new SimpleDateFormat("MM/dd/YYYY");
+                SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
                 df.applyPattern("MM/dd/yyyy");
                 Date startDate = null;
                 Date endDate = null;
@@ -190,9 +190,14 @@ public class EquipmentDetailActivity extends AppCompatActivity implements DatePi
                     e.printStackTrace();
                 }
 
-                String combinedDateString = df.format(startDate) + " - " + df.format(endDate);
+                if (startDate!=null && endDate !=null) {
+                    String combinedDateString = df.format(startDate) + " - " + df.format(endDate);
+                    ((TextView)findViewById(R.id.date_range)).setText(combinedDateString);
+                } else {
+                    ((TextView)findViewById(R.id.date_range)).setText("");
+                }
 
-                ((TextView)findViewById(R.id.date_range)).setText(combinedDateString);
+
 
                 //get borrower information
                 DatabaseReference borrowerRef = FirebaseDatabase.getInstance()

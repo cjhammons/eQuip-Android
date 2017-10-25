@@ -35,7 +35,6 @@ class Equipment {
                 imagePaths: MutableList<String>?, available: Boolean,
                 name: String) {
 
-        //todo add due date
         this.description = description
         this.ownerId = ownerId
         this.borrowerId = borrowerId
@@ -53,10 +52,7 @@ class Equipment {
     }
 
     @Exclude
-    fun unBorrow(borrowerId: String){
-        if (borrowerId != this.borrowerId){
-            return
-        }
+    fun unBorrow(){
         this.available = true
         this.borrowerId = ""
     }
@@ -89,7 +85,7 @@ class Equipment {
         result.put("available", available)
         result.put("name", name)
         result.put("reservationId", reservationId)
-        //todo due date
+        result.put("duedate", dueDate)
         return result
     }
 

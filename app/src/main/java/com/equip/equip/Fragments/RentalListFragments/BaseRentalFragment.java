@@ -26,6 +26,7 @@ import com.equip.equip.Fragments.EquipmentListFragments.BaseEquipmentListFragmen
 import com.equip.equip.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -39,6 +40,7 @@ import com.squareup.picasso.Picasso;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Curtis on 9/23/2017.
@@ -184,7 +186,7 @@ public abstract class BaseRentalFragment extends Fragment {
 
             if (getFragmentInstance() instanceof CurrentRentalsFragment) {
                 holder.mReturnButton.setVisibility(View.VISIBLE);
-                holder.mReturnButton.setOnClickListener(new ReturnButtonListener());
+                holder.mReturnButton.setOnClickListener(new ReturnButtonListener(equipment));
             } else {
                 holder.mReturnButton.setVisibility(View.GONE);
             }
@@ -231,14 +233,44 @@ public abstract class BaseRentalFragment extends Fragment {
                 mReturnButton = (Button) itemView.findViewById(R.id.return_button);
             }
         }
-    }
 
-    private class ReturnButtonListener implements View.OnClickListener {
+        class ReturnButtonListener implements View.OnClickListener {
+            private Equipment mEquipment;
 
-        @Override
-        public void onClick(View v) {
+            private ReturnButtonListener(Equipment equipment){
+                super();
+                this.mEquipment = equipment;
+            }
 
+            @Override
+            public void onClick(View v) {
+                mEquipmentList.remove(mEquipment);
+                mEquipment.unBorrow();
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+                DatabaseReference borrowerRef = ref.child("users/" + FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+                final HashMap<String, Object> childUpdates = new HashMap<>();
+                childUpdates.put("/equipment/" + mEquipment.getKey(), mEquipment.toMap());
+
+                borrowerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        User borrower = dataSnapshot.getValue(User.class);
+                        borrower.removeRentalId(mEquipment.getKey());
+                        childUpdates.put("/users/" + borrower.getUserId(), borrower.toMap());
+                        FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
+                        RentalAdapter.this.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+            }
         }
     }
+
+
 
 }
