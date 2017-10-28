@@ -11,7 +11,7 @@ import java.util.HashMap
 class Reservation {
     lateinit var equipmentId: String
     lateinit var ownerId: String
-    lateinit var borrowerId: String
+    var borrowerId: String = ""
     var key: String = ""
     var dateTimeReserved: String = ""
     var reservedPeriodStartDate: String = ""

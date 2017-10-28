@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -71,6 +72,8 @@ public class CreateItemListingActivity extends Activity {
     private EditText mNameText;
     private ImageView imageView;
 
+    private ProgressDialog mProgressDialog;
+
     private List<String> mSpinnerList;
 
     private FirebaseUser mUser;
@@ -128,6 +131,10 @@ public class CreateItemListingActivity extends Activity {
 
         FloatingTextButton createListingButton = (FloatingTextButton) findViewById(R.id.create_listing_button);
         createListingButton.setOnClickListener(new CreateListingListener());
+
+        mProgressDialog = new ProgressDialog(this);
+        mProgressDialog.setMessage(getString(R.string.uploading_photo));
+        mProgressDialog.setIndeterminate(true);
 
     }
 
@@ -266,7 +273,7 @@ public class CreateItemListingActivity extends Activity {
             mKey = mDatabase.child("equipment").push().getKey();
             mEquipment.addKey(mKey);
             updateItemInDatabase();
-
+            mProgressDialog.show();
             for (int i = 0; i < mPhotoStreams.size(); i++){
                 StorageReference equipmentImageRef = mStorage.child("equipment/" + mKey +"/" + i + ".jpg");
                 UploadTask uploadTask = equipmentImageRef.putStream(mPhotoStreams.get(i));
@@ -278,12 +285,14 @@ public class CreateItemListingActivity extends Activity {
                 }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        mProgressDialog.dismiss();
+                        CreateItemListingActivity.this.finish();
                     }
-                });
+                });//todo progress dialog
 
             }
 
-            CreateItemListingActivity.this.finish();
+
         }
 
         void updateItemInDatabase(){

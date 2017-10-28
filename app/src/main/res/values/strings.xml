@@ -83,8 +83,16 @@
     <string name="history_rentals_title">History</string>
     <string name="return_button">Return</string>
 
-    <!--User Detail-->
+    <!--User Detail Activity-->
     <string name="available_rentals_caps">AVAILABLE RENTALS</string>
+
+    <!--Edit Account Activity-->
+    <string name="account_display_name">Display Name</string>
+    <string name="account_address">Address</string>
+    <string name="account_email">Email Address</string>
+    <string name="account_phone">Phone Number</string>
+    <string name="confirm_changes">Confirm Changes</string>
+    <string name="uploading_photo">Uploading Photo</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

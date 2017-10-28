@@ -31,6 +31,8 @@ import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 import com.borax12.materialdaterangepicker.date.DatePickerDialog;
 
+import org.w3c.dom.Text;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -60,7 +62,7 @@ public class EquipmentDetailActivity extends AppCompatActivity implements DatePi
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setTitle("");
+//        getSupportActionBar().setTitle("");
 
         final String key = getIntent().getStringExtra("equipmentKey");
         final DatabaseReference databaseReference = FirebaseDatabase.getInstance()
@@ -104,6 +106,8 @@ public class EquipmentDetailActivity extends AppCompatActivity implements DatePi
         TextView description = (TextView) findViewById(R.id.equipment_description);
         TextView name = (TextView) findViewById(R.id.equipment_title);
         TextView availableText = (TextView) findViewById(R.id.available_text);
+        final TextView sellerName = (TextView) findViewById(R.id.seller_name);
+        final TextView sellerAddress = (TextView) findViewById(R.id.seller_address);
 
         FloatingTextButton reserveButton = (FloatingTextButton) findViewById(R.id.reserve_item_fab);
         if (mIsOwner) {
@@ -135,6 +139,7 @@ public class EquipmentDetailActivity extends AppCompatActivity implements DatePi
         description.setText(mEquipment.getDescription());
         name.setText(mEquipment.getName());
 
+
         DatabaseReference databaseReference = FirebaseDatabase.getInstance()
                 .getReference()
                 .child("users/" + mEquipment.getOwnerId());
@@ -143,6 +148,8 @@ public class EquipmentDetailActivity extends AppCompatActivity implements DatePi
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 mOwner = dataSnapshot.getValue(User.class);
+                sellerName.setText(mOwner.getDisplayName());
+                sellerAddress.setText(mOwner.getAddress());
             }
 
             @Override
@@ -157,7 +164,7 @@ public class EquipmentDetailActivity extends AppCompatActivity implements DatePi
             availableText.setText(getString(R.string.not_available).toUpperCase());
             reserveButton.setEnabled(false);
             reserveButton.setVisibility(View.GONE);
-            if (mIsOwner) {
+            if (mIsOwner && !mEquipment.getBorrowerId().equals("")) {
                 populateReservationInfo();
             }
         } else {
@@ -267,9 +274,9 @@ public class EquipmentDetailActivity extends AppCompatActivity implements DatePi
                     now.get(Calendar.YEAR),
                     now.get(Calendar.MONTH),
                     now.get(Calendar.DAY_OF_MONTH)
-                    //set the present date to be the minimum date that can be selected 
-                    datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+                    //set the present date to be the minimum date that can be selected
             );
+            datePickerDialog.setMinDate(now);
             datePickerDialog.show(getFragmentManager(), "TimePickerDialog");
         }
     }

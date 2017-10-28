@@ -30,6 +30,9 @@
         <activity android:name=".Activities.DashboardActivity" />
         <activity android:name=".Activities.CreateItemListingActivity" />
         <activity android:name=".Activities.UserDetailActivity"/>
+        <activity android:name=".Activities.EquipmentDetailActivity" />
+        <activity android:name=".Activities.AccountEditActivity"/>
+
         <service android:name=".FirebaseServices.MyFirebaseInstanceIDService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
@@ -54,7 +57,6 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".Activities.EquipmentDetailActivity" />
     </application>
 
 </manifest>

@@ -85,8 +85,10 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
         myEquipment.setDrawerCallBack(this);
         DrawerMenuItem dashboard = new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_DASHBOARD);
         dashboard.setDrawerCallBack(this);
+
+        DrawerHeader drawerHeader = new DrawerHeader(this, mUser.getDisplayName(), mUser.getEmail(), mUser.getPhotoUrl(), new DrawerHeaderListener());
         mDrawerView
-                .addView(new DrawerHeader(mUser.getDisplayName(), mUser.getEmail(), mUser.getPhotoUrl()))
+                .addView(drawerHeader)
 //                .addView(search)
 //                .addView(profile)
 //                .addView(messages)
@@ -179,6 +181,14 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
         @Override
         public void onClick(View v) {
             Intent intent = new Intent(DashboardActivity.this, CreateItemListingActivity.class);
+            startActivity(intent);
+        }
+    }
+
+    private class DrawerHeaderListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(DashboardActivity.this, AccountEditActivity.class);
             startActivity(intent);
         }
     }

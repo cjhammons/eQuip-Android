@@ -10,9 +10,9 @@ import java.util.HashMap
 @IgnoreExtraProperties
 class User {
     lateinit var userId: String
-    lateinit var email: String
-    lateinit var displayName: String
-    lateinit var picUrl: String
+    var email: String = ""
+    var displayName: String = ""
+    var picUrl: String = ""
     var googleConnected: Boolean = false
     var facebookConnected: Boolean = false
     var notificationTokens: MutableList<String>? = ArrayList<String>()
@@ -20,6 +20,7 @@ class User {
     var reservationIds: MutableList<String> = ArrayList<String>()
     var rentalIds: MutableList<String> = ArrayList<String>()
     var historicRentalIds: MutableList<String> = ArrayList<String>()
+    var phoneNumber: String = ""
 
     //Vendor only
     var ownedReservationIds: MutableList<String> = ArrayList<String>()
@@ -152,6 +153,7 @@ class User {
         result.put("address", address)
         result.put("rentalIds", rentalIds)
         result.put("historicRentalIds", historicRentalIds)
+        result.put("phoneNumber", phoneNumber)
         return result
     }
 
