@@ -267,6 +267,8 @@ public class EquipmentDetailActivity extends AppCompatActivity implements DatePi
                     now.get(Calendar.YEAR),
                     now.get(Calendar.MONTH),
                     now.get(Calendar.DAY_OF_MONTH)
+                    //set the present date to be the minimum date that can be selected 
+                    datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
             );
             datePickerDialog.show(getFragmentManager(), "TimePickerDialog");
         }
