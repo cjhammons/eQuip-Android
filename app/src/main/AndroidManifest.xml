@@ -29,7 +29,7 @@
         </activity>
         <activity android:name=".Activities.DashboardActivity" />
         <activity android:name=".Activities.CreateItemListingActivity" />
-
+        <activity android:name=".Activities.UserDetailActivity"/>
         <service android:name=".FirebaseServices.MyFirebaseInstanceIDService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />

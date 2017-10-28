@@ -1,5 +1,6 @@
 package com.equip.equip.Activities;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -162,6 +163,8 @@ public class EquipmentDetailActivity extends AppCompatActivity implements DatePi
         } else {
             availableText.setText(getString(R.string.available).toUpperCase());
         }
+
+        findViewById(R.id.seller_container).setOnClickListener(new SellerDetailListener());
     }
 
     //Only called when the user owns the item and the item has been reserved
@@ -315,4 +318,13 @@ public class EquipmentDetailActivity extends AppCompatActivity implements DatePi
         }
     }
 
+    private class SellerDetailListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(EquipmentDetailActivity.this, UserDetailActivity.class);
+            intent.putExtra("userKey", mEquipment.getOwnerId());
+            startActivity(intent);
+        }
+    }
 }
