@@ -1,14 +1,22 @@
 package com.equip.equip.Activities;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
+import android.provider.SearchRecentSuggestions;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
+import android.widget.EditText;
 
 import com.equip.equip.ExtraUIElements.Drawer.DrawerHeader;
 import com.equip.equip.ExtraUIElements.Drawer.DrawerMenuItem;
@@ -16,8 +24,12 @@ import com.equip.equip.Fragments.EquipmentListFragments.MyEquipmentListFragment;
 import com.equip.equip.Fragments.EquipmentListFragments.NearbyListFragment;
 import com.equip.equip.Fragments.MyRentalsFragment;
 import com.equip.equip.R;
+import com.equip.equip.Search.MySuggestionProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.mindorks.placeholderview.PlaceHolderView;
 
 import ru.dimorinny.floatingtextbutton.FloatingTextButton;
@@ -43,18 +55,27 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
+        Intent intent = getIntent();
+
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())){
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
+                    MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE);
+            suggestions.saveRecentQuery(query, null);
+            Log.d(TAG, "doing search");
+            doSearch(query);
+        }
+
         mDrawer = (DrawerLayout)findViewById(R.id.drawer_layout);
         mDrawerView = (PlaceHolderView)findViewById(R.id.drawerView);
 
         mToolbar = (Toolbar)findViewById(R.id.toolbar);
         mToolbar.setTitle(getString(R.string.app_name));
         setSupportActionBar(mToolbar);
-//        mFab = (FloatingActionButton) findViewById(R.id.fab_add);
         mFab = (FloatingTextButton) findViewById(R.id.fab_add);
         mFab.setOnClickListener(new FabListener());
 
-//        mViewPager = (ViewPager) findViewById(R.id.tab_pager);
-//        mTabLayout = (TabLayout) findViewById(R.id.tab_layout);
+
 
         mUser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -64,9 +85,26 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
                 .replace(R.id.fragment_container, new NearbyListFragment())
                 .addToBackStack("Nearby")
                 .commit();
-//        getSupportActionBar().setTitle(getString(R.string.app_name));
         setupDrawer();
+
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
+        EditText searchEditText = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        searchEditText.setTextColor(getResources().getColor(R.color.white));
+        searchEditText.setHintTextColor(getResources().getColor(R.color.white));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setIconifiedByDefault(false);
+
+        return true;
+    }
+
 
     private void setupDrawer(){
         DrawerMenuItem search = new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_SEARCH);
@@ -183,6 +221,13 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
             Intent intent = new Intent(DashboardActivity.this, CreateItemListingActivity.class);
             startActivity(intent);
         }
+    }
+
+    void doSearch(String query){
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("equipment");
+        DatabaseReference categoryReference = (DatabaseReference) databaseReference.orderByChild(query);
+
+
     }
 
     private class DrawerHeaderListener implements View.OnClickListener {

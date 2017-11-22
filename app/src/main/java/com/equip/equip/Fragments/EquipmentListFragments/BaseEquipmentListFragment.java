@@ -168,14 +168,6 @@ public abstract class BaseEquipmentListFragment extends Fragment {
             if (!equipment.getAvailable() && getFragmentInstance() instanceof MyEquipmentListFragment){
                 holder.mReserveNotification.setVisibility(View.VISIBLE);
             }
-
-//            if (equipment.getImagePaths() == null) return;
-//            int dimension = 350;
-//            Picasso.with(getActivity())
-//                    .load(equipment.getImagePaths().get(0))
-//                    .resize(dimension, dimension)
-//                    .centerCrop()
-//                    .into(holder.mImage);
         }
 
         /**
