@@ -1,4 +1,4 @@
-package com.equip.equip.Search;
+package com.equip.equip.Util.Search;
 
 import android.app.Activity;
 import android.app.SearchManager;
@@ -7,8 +7,6 @@ import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.support.annotation.Nullable;
 import android.util.Log;
-
-import com.equip.equip.R;
 
 /**
  * Created by Curtis on 11/20/2017.

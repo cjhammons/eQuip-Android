@@ -11,9 +11,9 @@
         android:name="android.hardware.camera"
         android:required="true" />
 
-
-
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -70,8 +70,8 @@
         </provider>
 
         <provider
-            android:authorities="com.equip.equip.Search.MySuggestionProvider"
-            android:name=".Search.MySuggestionProvider"/>
+            android:authorities="com.equip.equip.Util.Search.MySuggestionProvider"
+            android:name=".Util.Search.MySuggestionProvider"/>
 
     </application>
 

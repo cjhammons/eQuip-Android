@@ -1,9 +1,15 @@
 package com.equip.equip.Activities;
 
+import android.Manifest;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.provider.SearchRecentSuggestions;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -18,23 +24,36 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.widget.EditText;
 
+import com.equip.equip.DataStructures.UserSearch;
 import com.equip.equip.ExtraUIElements.Drawer.DrawerHeader;
 import com.equip.equip.ExtraUIElements.Drawer.DrawerMenuItem;
 import com.equip.equip.Fragments.EquipmentListFragments.MyEquipmentListFragment;
 import com.equip.equip.Fragments.EquipmentListFragments.NearbyListFragment;
 import com.equip.equip.Fragments.MyRentalsFragment;
 import com.equip.equip.R;
-import com.equip.equip.Search.MySuggestionProvider;
+import com.equip.equip.Util.PermissionUtils;
+import com.equip.equip.Util.Search.MySuggestionProvider;
+import com.equip.equip.Util.location.LocationHelper;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.mindorks.placeholderview.PlaceHolderView;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import ru.dimorinny.floatingtextbutton.FloatingTextButton;
 
-public class DashboardActivity extends AppCompatActivity implements DrawerMenuItem.DrawerCallBack{
+public class DashboardActivity extends AppCompatActivity implements DrawerMenuItem.DrawerCallBack,
+        GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener {
 
     public static final String TAG = "DashboardActivity";
 
@@ -45,6 +64,8 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
     private FirebaseUser mUser;
 //    private FloatingActionButton mFab;
     private FloatingTextButton mFab;
+    static LocationHelper mLocationHelper;
+    Location mLocation;
 
     //TODO finish tab thing?
     private ViewPager mViewPager;
@@ -64,6 +85,8 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
             suggestions.saveRecentQuery(query, null);
             Log.d(TAG, "doing search");
             doSearch(query);
+        } else {
+            mLocationHelper = new LocationHelper(this);
         }
 
         mDrawer = (DrawerLayout)findViewById(R.id.drawer_layout);
@@ -87,6 +110,19 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
                 .commit();
         setupDrawer();
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mLocationHelper.buildGoogleApiClient();
+        mLocationHelper.connectApiClient();
+        mLocationHelper.getLocation();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
     @Override
@@ -215,6 +251,44 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
         startActivity(intent);
     }
 
+
+    void doSearch(String query){
+        mUser = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference searchRef = FirebaseDatabase.getInstance().getReference()
+                .child("/search/")
+                .child("/searches/");
+        mLocation = mLocationHelper.getLastLocation();
+        mLocation = mLocationHelper.getLocation();
+
+        UserSearch userSearch = new UserSearch(query, mUser.getUid(),
+                new Date().toString(),
+                mLocation.getLatitude(),
+                mLocation.getLongitude());
+        String key = searchRef.push().getKey();
+        Map<String, Object> searchValues = userSearch.toMap();
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put(key, searchValues);
+        searchRef.updateChildren(childUpdates);
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        mLocationHelper.getLocation();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        mLocationHelper.buildGoogleApiClient();
+        mLocationHelper.connectApiClient();
+        mLocationHelper.getLocation();
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = "
+                + connectionResult.getErrorCode());
+    }
+
     private class FabListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
@@ -223,12 +297,6 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
         }
     }
 
-    void doSearch(String query){
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("equipment");
-        DatabaseReference categoryReference = (DatabaseReference) databaseReference.orderByChild(query);
-
-
-    }
 
     private class DrawerHeaderListener implements View.OnClickListener {
         @Override

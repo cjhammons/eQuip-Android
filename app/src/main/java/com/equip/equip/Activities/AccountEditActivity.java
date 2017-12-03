@@ -1,5 +1,6 @@
 package com.equip.equip.Activities;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -7,12 +8,17 @@ import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.View;
@@ -22,8 +28,10 @@ import android.widget.ImageView;
 
 import com.equip.equip.DataStructures.User;
 import com.equip.equip.R;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -43,8 +51,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -71,6 +82,7 @@ public class AccountEditActivity extends Activity {
 
     private static final int REQUEST_IMAGE_FROM_PHONE = 0;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int REQUEST_LOCATION_PERMISION = 10;
 
     private InputStream mPhotoStream;
 
@@ -130,41 +142,117 @@ public class AccountEditActivity extends Activity {
     }
 
     void updateUser(){
-        UploadTask uploadTask = mStorageReference
-                .child("/profilePicture.jpg")
-                .putStream(mPhotoStream);
-        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                mUser.setDisplayName(mDisplayNameView.getText().toString());
-                mUser.setAddress(mAddressView.getText().toString());
-                mUser.setEmail(mEmailView.getText().toString());
-                mUser.setPhoneNumber(mPhoneView.getText().toString());
-                mUser.setPicUrl(mProfilePicURL);
+        if (mPhotoStream != null) {
+            UploadTask uploadTask = mStorageReference
+                    .child("/profilePicture.jpg")
+                    .putStream(mPhotoStream);
+            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
 
-                //upload
-                Map<String, Object> userValues = mUser.toMap();
-                Map<String, Object> childUpdates = new HashMap<>();
-                childUpdates.put("users/" + mUser.getUserId(), userValues);
-                FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
-                mProgressDialog.dismiss();
-                finish();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
+                    mUser.setPicUrl(mProfilePicURL);
 
-            }
-        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                    //upload
+                    Map<String, Object> userValues = mUser.toMap();
+                    Map<String, Object> childUpdates = new HashMap<>();
+                    childUpdates.put("users/" + mUser.getUserId(), userValues);
+                    FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
+                    mProgressDialog.dismiss();
+                    finish();
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    mProgressDialog.dismiss();
 
-                double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
-                System.out.println("Upload is " + progress + "% done");
-                int currentprogress = (int) progress;
-                mProgressDialog.setProgress(currentprogress);
+                }
+            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+
+                    double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                    System.out.println("Upload is " + progress + "% done");
+                    int currentprogress = (int) progress;
+                    mProgressDialog.setProgress(currentprogress);
+                }
+            }).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                    mProgressDialog.dismiss();
+                }
+            });
+        }
+
+        mUser.setDisplayName(mDisplayNameView.getText().toString());
+        mUser.setAddress(mAddressView.getText().toString());
+        mUser.setEmail(mEmailView.getText().toString());
+        mUser.setPhoneNumber(mPhoneView.getText().toString());
+
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                // Show an explanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+            } else {
+
+                // No explanation needed, we can request the permission.
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        REQUEST_LOCATION_PERMISION);
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
             }
-        });
+        }
+
+        List<Address> geocodes = new ArrayList<Address>();
+        Geocoder geocoder = new Geocoder(AccountEditActivity.this);
+        try {
+            geocodes = geocoder.getFromLocationName(mAddressView.getText().toString(), 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Address addr = new Address(Locale.getDefault());
+        if (geocodes != null) {
+            addr = geocodes.get(0);
+            double lat = addr.getLatitude();
+            double lng = addr.getLongitude();
+            mUser.setGeolocation(addr.getLatitude(), addr.getLongitude());
+        }
+        Map<String, Object> userValues = mUser.toMap();
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("users/" + mUser.getUserId(), userValues);
+        FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_LOCATION_PERMISION:
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+        }
     }
 
     //copied form CreateItemListingActivity

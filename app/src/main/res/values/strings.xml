@@ -94,9 +94,11 @@
     <string name="confirm_changes">Confirm Changes</string>
     <string name="uploading_photo">Uploading Photo</string>
 
-    <!--Search-->
+    <!--UserSearch -->
     <string name="search_hint">Search eQuip</string>
     <string name="search_menu_title">Search</string>
+
+    <string name="need_gps_permission">Need GPS permission for getting your location</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

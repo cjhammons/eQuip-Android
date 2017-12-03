@@ -21,6 +21,9 @@ class User {
     var rentalIds: MutableList<String> = ArrayList<String>()
     var historicRentalIds: MutableList<String> = ArrayList<String>()
     var phoneNumber: String = ""
+    var geoloc: HashMap<String, Double> = HashMap<String, Double>()
+
+
 
     //Vendor only
     var ownedReservationIds: MutableList<String> = ArrayList<String>()
@@ -47,6 +50,29 @@ class User {
         this.isVendor = true
     }
 
+    @Exclude
+    fun setGeolocation(lat: Double, lng: Double ): Boolean{
+        geoloc = HashMap<String, Double>()
+        if (lat > 90.0 || lat < 0.0)
+            return false
+        if (lng > 180 || lng < -180){
+            return false
+        }
+        geoloc.put("lat", lat)
+        geoloc.put("lng", lng)
+        return true
+    }
+
+    @Exclude
+    fun getLat(): Double {
+        return geoloc.get("lat")!!.toDouble()
+    }
+
+    @Exclude
+    fun getLng(): Double{
+        return geoloc.get("lng")!!.toDouble()
+    }
+
     /**
      * If the user has no set display name, return their email address instead
      */
@@ -57,38 +83,6 @@ class User {
         } else {
            return this.displayName
         }
-    }
-
-    @Exclude
-    fun addReservation(reservationId: String){
-        if (reservationId.equals(""))
-            return
-        reservationIds.add(reservationId)
-    }
-
-    @Exclude
-    fun removeReservation(reservationId: String) {
-        if (reservationId.equals(""))
-            return
-        reservationIds.remove(reservationId)
-    }
-
-    @Exclude
-    fun addOwnedReservation(reservationId: String){
-        if (!isVendor)
-            return
-        if (reservationId.equals(""))
-            return
-        ownedReservationIds.add(reservationId)
-    }
-
-    @Exclude
-    fun removeOwnedReservation(reservationId: String) {
-        if (!isVendor)
-            return
-        if (reservationId.equals(""))
-            return
-        ownedReservationIds.remove(reservationId)
     }
 
     @Exclude
@@ -154,6 +148,7 @@ class User {
         result.put("rentalIds", rentalIds)
         result.put("historicRentalIds", historicRentalIds)
         result.put("phoneNumber", phoneNumber)
+        result.put("geoloc", geoloc)
         return result
     }
 

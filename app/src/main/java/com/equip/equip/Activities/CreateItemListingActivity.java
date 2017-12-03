@@ -288,7 +288,7 @@ public class CreateItemListingActivity extends Activity {
                         mProgressDialog.dismiss();
                         CreateItemListingActivity.this.finish();
                     }
-                });//todo progress dialog
+                });
 
             }
 
@@ -296,20 +296,24 @@ public class CreateItemListingActivity extends Activity {
         }
 
         void updateItemInDatabase(){
-            Map<String, Object> equipmentValues = mEquipment.toMap();
-            final Map<String, Object> childUpdates = new HashMap<>();
-            childUpdates.put("/equipment/" + mKey, equipmentValues);
+
             final DatabaseReference userReference = mDatabase.getDatabase().getReference()
                     .child("users/" + mUser.getUid());
             final ValueEventListener listener = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
+                    final Map<String, Object> childUpdates = new HashMap<>();
+
                     User user = dataSnapshot.getValue(User.class);
                     user.addEquipmentListing(mKey);
                     List<String> userEquipment = user.getEquipmentListings();
                     childUpdates.put("users/"
                             + user.getUserId() + "/equipmentListings",
                             userEquipment);
+
+                    mEquipment.setGeolocation(user.getLat(), user.getLng());
+                    Map<String, Object> equipmentValues = mEquipment.toMap();
+                    childUpdates.put("/equipment/" + mKey, equipmentValues);
                     mDatabase.updateChildren(childUpdates);
                 }
 

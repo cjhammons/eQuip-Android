@@ -25,6 +25,8 @@ class Equipment {
     lateinit var key: String
     var dueDate: String = ""
     var reservationId: String = ""
+    var geoloc: HashMap<String, Double> = HashMap<String, Double>()
+
 
     constructor() {
         //Default
@@ -72,6 +74,19 @@ class Equipment {
     }
 
     @Exclude
+    fun setGeolocation(lat: Double, lng: Double ): Boolean{
+        geoloc = HashMap<String, Double>()
+        if (lat > 90.0 || lat < 0.0)
+            return false
+        if (lng > 180 || lng < -180){
+            return false
+        }
+        geoloc.put("lat", lat)
+        geoloc.put("lng", lng)
+        return true
+    }
+
+    @Exclude
     fun toMap(): Map<String, Any> {
         val result = HashMap<String, Any>()
         result.put("key", key)
@@ -86,6 +101,7 @@ class Equipment {
         result.put("name", name)
         result.put("reservationId", reservationId)
         result.put("duedate", dueDate)
+        result.put("geoloc", geoloc)
         return result
     }
 

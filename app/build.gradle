@@ -67,6 +67,7 @@ dependencies {
     compile 'com.google.firebase:firebase-messaging:10.0.1'
     compile 'com.github.clans:fab:1.6.4'
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.google.android.gms:play-services-location:10.0.1'
     compile 'com.github.dimorinny:floating-text-button:0.0.2'
     compile 'com.borax12.materialdaterangepicker:library:1.9'
 
