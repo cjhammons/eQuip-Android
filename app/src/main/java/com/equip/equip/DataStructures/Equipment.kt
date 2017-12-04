@@ -20,12 +20,12 @@ class Equipment {
     lateinit var borrowerId: String
     lateinit var category: String
     var name: String = ""
-    var imagePaths: MutableList<String>? = null
     var available: Boolean = false
     lateinit var key: String
     var dueDate: String = ""
     var reservationId: String = ""
     var geoloc: HashMap<String, Double> = HashMap<String, Double>()
+    var thumbnailPath: String = ""
 
 
     constructor() {
@@ -34,14 +34,13 @@ class Equipment {
 
     constructor(description: String, ownerId: String,
                 borrowerId: String, category: String,
-                imagePaths: MutableList<String>?, available: Boolean,
+                available: Boolean,
                 name: String) {
 
         this.description = description
         this.ownerId = ownerId
         this.borrowerId = borrowerId
         this.category = category
-        this.imagePaths = imagePaths
         this.available = available
         this.key = ""
         this.name = name
@@ -65,15 +64,6 @@ class Equipment {
     }
 
     @Exclude
-    fun addImageUri(imageUri: Uri) {
-        if (imagePaths == null) {
-            imagePaths = ArrayList<String>()
-        }
-
-        imagePaths!!.add(imageUri.toString())
-    }
-
-    @Exclude
     fun setGeolocation(lat: Double, lng: Double ): Boolean{
         geoloc = HashMap<String, Double>()
         if (lat > 90.0 || lat < 0.0)
@@ -94,9 +84,6 @@ class Equipment {
         result.put("ownerId", ownerId)
         result.put("borrowerId", borrowerId)
         result.put("category", category)
-        if (imagePaths != null) {
-            result.put("imagePaths", imagePaths!!)
-        }
         result.put("available", available)
         result.put("name", name)
         result.put("reservationId", reservationId)

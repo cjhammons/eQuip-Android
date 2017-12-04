@@ -26,6 +26,10 @@ public class EquipApplication extends Application {
     private final static String LOG_TAG = Application.class.getSimpleName();
     public static List<String> EQUIPMENT_CATEGORIES = new ArrayList<>();
 
+    public static String ALGOLIA_APP_ID = "0Z8PY28AQ6";
+    public static String ALGOLIA_SEARCH_API_KEY = "7f8627aebb14a9b51ad64d74b48438e5";
+    public static String ALGOLIA_EQUIPMENT_INDEX_NAME = "EQUIPMENT";
+
     @Override
     public void onCreate() {
         super.onCreate();

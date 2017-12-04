@@ -267,7 +267,6 @@ public class CreateItemListingActivity extends Activity {
                     mUser.getUid(),
                     "",
                     mCategorySpinner.getSelectedItem().toString(),
-                    null,
                     true,
                     mNameText.getText().toString());
             mKey = mDatabase.child("equipment").push().getKey();

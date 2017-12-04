@@ -1,11 +1,8 @@
 package com.equip.equip.Activities;
 
-import android.Manifest;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.provider.SearchRecentSuggestions;
 import android.support.annotation.NonNull;
@@ -24,14 +21,16 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.widget.EditText;
 
+import com.algolia.instantsearch.helpers.InstantSearch;
+import com.algolia.instantsearch.helpers.Searcher;
 import com.equip.equip.DataStructures.UserSearch;
+import com.equip.equip.EquipApplication;
 import com.equip.equip.ExtraUIElements.Drawer.DrawerHeader;
 import com.equip.equip.ExtraUIElements.Drawer.DrawerMenuItem;
 import com.equip.equip.Fragments.EquipmentListFragments.MyEquipmentListFragment;
 import com.equip.equip.Fragments.EquipmentListFragments.NearbyListFragment;
 import com.equip.equip.Fragments.MyRentalsFragment;
 import com.equip.equip.R;
-import com.equip.equip.Util.PermissionUtils;
 import com.equip.equip.Util.Search.MySuggestionProvider;
 import com.equip.equip.Util.location.LocationHelper;
 import com.google.android.gms.common.ConnectionResult;
@@ -42,12 +41,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.mindorks.placeholderview.PlaceHolderView;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import ru.dimorinny.floatingtextbutton.FloatingTextButton;
@@ -65,7 +60,6 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
 //    private FloatingActionButton mFab;
     private FloatingTextButton mFab;
     static LocationHelper mLocationHelper;
-    Location mLocation;
 
     //TODO finish tab thing?
     private ViewPager mViewPager;
@@ -78,13 +72,15 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
 
         Intent intent = getIntent();
 
+
+
         if (Intent.ACTION_SEARCH.equals(intent.getAction())){
             String query = intent.getStringExtra(SearchManager.QUERY);
             SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
                     MySuggestionProvider.AUTHORITY, MySuggestionProvider.MODE);
             suggestions.saveRecentQuery(query, null);
             Log.d(TAG, "doing search");
-            doSearch(query);
+//            doSearch(query);
         } else {
             mLocationHelper = new LocationHelper(this);
         }
@@ -120,6 +116,7 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
         mLocationHelper.getLocation();
     }
 
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -128,15 +125,15 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
+//        inflater.inflate(R.menu.menu, menu);
 
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
-        EditText searchEditText = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
-        searchEditText.setTextColor(getResources().getColor(R.color.white));
-        searchEditText.setHintTextColor(getResources().getColor(R.color.white));
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setIconifiedByDefault(false);
+//        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//        SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
+//        EditText searchEditText = (EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+//        searchEditText.setTextColor(getResources().getColor(R.color.white));
+//        searchEditText.setHintTextColor(getResources().getColor(R.color.white));
+//        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+//        searchView.setIconifiedByDefault(false);
 
         return true;
     }
@@ -163,7 +160,7 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
         DrawerHeader drawerHeader = new DrawerHeader(this, mUser.getDisplayName(), mUser.getEmail(), mUser.getPhotoUrl(), new DrawerHeaderListener());
         mDrawerView
                 .addView(drawerHeader)
-//                .addView(search)
+                .addView(search)
 //                .addView(profile)
 //                .addView(messages)
                 .addView(dashboard)
@@ -189,7 +186,8 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
 
     @Override
     public void onItemSearchSelected() {
-        //todo
+        Intent intent = new Intent(this, SearchActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -252,24 +250,24 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
     }
 
 
-    void doSearch(String query){
-        mUser = FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference searchRef = FirebaseDatabase.getInstance().getReference()
-                .child("/search/")
-                .child("/searches/");
-        mLocation = mLocationHelper.getLastLocation();
-        mLocation = mLocationHelper.getLocation();
-
-        UserSearch userSearch = new UserSearch(query, mUser.getUid(),
-                new Date().toString(),
-                mLocation.getLatitude(),
-                mLocation.getLongitude());
-        String key = searchRef.push().getKey();
-        Map<String, Object> searchValues = userSearch.toMap();
-        Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put(key, searchValues);
-        searchRef.updateChildren(childUpdates);
-    }
+//    void doSearch(String query){
+//        mUser = FirebaseAuth.getInstance().getCurrentUser();
+//        DatabaseReference searchRef = FirebaseDatabase.getInstance().getReference()
+//                .child("/search/")
+//                .child("/searches/");
+//        mLocation = mLocationHelper.getLastLocation();
+//        mLocation = mLocationHelper.getLocation();
+//
+//        UserSearch userSearch = new UserSearch(query, mUser.getUid(),
+//                new Date().toString(),
+//                mLocation.getLatitude(),
+//                mLocation.getLongitude());
+//        String key = searchRef.push().getKey();
+//        Map<String, Object> searchValues = userSearch.toMap();
+//        Map<String, Object> childUpdates = new HashMap<>();
+//        childUpdates.put(key, searchValues);
+//        searchRef.updateChildren(childUpdates);
+//    }
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {

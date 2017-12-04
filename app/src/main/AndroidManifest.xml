@@ -41,6 +41,7 @@
         <activity android:name=".Activities.UserDetailActivity"/>
         <activity android:name=".Activities.EquipmentDetailActivity" />
         <activity android:name=".Activities.AccountEditActivity"/>
+        <activity android:name=".Activities.SearchActivity"/>
         <service android:name=".FirebaseServices.MyFirebaseInstanceIDService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />

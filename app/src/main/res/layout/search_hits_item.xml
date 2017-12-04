@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:algolia="http://schemas.android.com/apk/res-auto">
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+            <com.equip.equip.ExtraUIElements.SearchHitViews.ThumbnailHitView
+                android:id="@+id/equipment_image"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_margin="10dp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/equipment_name"
+                algolia:attribute='@{"name"}'
+                android:textColor="@color/textDark"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/equipment_category"
+                android:textColor="@color/textDark"
+                algolia:attribute='@{"category"}'/>
+    </LinearLayout>
+</layout>

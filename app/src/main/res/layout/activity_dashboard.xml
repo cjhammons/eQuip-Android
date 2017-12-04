@@ -18,19 +18,8 @@
             android:id="@+id/toolbar"
             layout="@layout/toolbar" />
 
-        <!--<com.github.clans.fab.FloatingActionButton-->
-            <!--android:id="@+id/fab_add"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_alignParentBottom="true"-->
-            <!--android:layout_alignParentEnd="true"-->
-            <!--android:layout_gravity="bottom|end"-->
-            <!--android:layout_marginBottom="20dp"-->
-            <!--android:layout_marginEnd="20dp"-->
-            <!--android:elevation="8dp"-->
-            <!--android:src="@drawable/ic_add"-->
-            <!--android:visibility="visible"-->
-            <!--fab:fab_colorNormal="@color/colorAccent" />-->
+
+
 
         <ru.dimorinny.floatingtextbutton.FloatingTextButton
             android:id="@+id/fab_add"
@@ -44,14 +33,6 @@
             android:layout_marginBottom="20dp"
             android:elevation="8dp"
             />
-
-        <!--<fragment-->
-            <!--android:id="@+id/dashboard_fragment_container"-->
-            <!--android:name="com.equip.equip.Fragments.EquipmentListFragments.BaseEquipmentListFragment"-->
-            <!--android:layout_below="@id/toolbar"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--tools:layout="@layout/fragment_dashboard_list" />-->
 
         <FrameLayout
             android:layout_below="@id/toolbar"
