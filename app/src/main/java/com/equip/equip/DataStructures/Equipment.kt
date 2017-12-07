@@ -25,7 +25,6 @@ class Equipment {
     var dueDate: String = ""
     var reservationId: String = ""
     var geoloc: HashMap<String, Double> = HashMap<String, Double>()
-    var thumbnailPath: String = ""
 
 
     constructor() {
