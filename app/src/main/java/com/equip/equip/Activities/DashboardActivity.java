@@ -23,7 +23,6 @@ import android.widget.EditText;
 
 import com.algolia.instantsearch.helpers.InstantSearch;
 import com.algolia.instantsearch.helpers.Searcher;
-import com.equip.equip.DataStructures.UserSearch;
 import com.equip.equip.EquipApplication;
 import com.equip.equip.ExtraUIElements.Drawer.DrawerHeader;
 import com.equip.equip.ExtraUIElements.Drawer.DrawerMenuItem;
@@ -220,11 +219,7 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
 
     @Override
     public void onDashboardSelected() {
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment_container, new NearbyListFragment())
-                .addToBackStack("Dashboard")
-                .commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new NearbyListFragment()).addToBackStack("Dashboard").commit();
         getSupportActionBar().setTitle(getString(R.string.app_name));
         mDrawer.closeDrawers();
         mFab.setVisibility(View.VISIBLE);

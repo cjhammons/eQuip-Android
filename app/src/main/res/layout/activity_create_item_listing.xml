@@ -52,7 +52,8 @@
         <Spinner
             android:id="@+id/category_spinner"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp" />
 
         <TextView
             android:id="@+id/textView3"
@@ -65,11 +66,76 @@
             android:id="@+id/equipment_description_entry"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
             android:background="@android:color/transparent"
             android:hint="@string/description_hint" />
 
+        <TextView
+            android:id="@+id/rate_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Rate"
+            android:textColor="@android:color/black" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="12dp"
+            android:orientation="horizontal">
 
+            <EditText
+                android:id="@+id/equipment_rate_entry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:hint="$ rate"
+                android:inputType="numberDecimal" />
+
+            <Spinner
+                android:id="@+id/rate_period_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/location_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Location"
+            android:textColor="@android:color/black" />
+
+        <RadioGroup
+            android:id="@+id/location_radio_group"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="12dp"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:id="@+id/radioButton_currentLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Current Location" />
+
+            <RadioButton
+                android:id="@+id/radioButton_otherLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Other Location" />
+
+        </RadioGroup>
+
+        <EditText
+            android:id="@+id/location_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Enter Address"
+            android:inputType="textPostalAddress" />
 
 
     </LinearLayout>

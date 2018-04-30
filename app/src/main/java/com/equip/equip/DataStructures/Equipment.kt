@@ -25,7 +25,13 @@ class Equipment {
     var dueDate: String = ""
     var reservationId: String = ""
     var geoloc: HashMap<String, Double> = HashMap<String, Double>()
+    var ratePrice: Double = 0.0
+    lateinit var rateUnit: RateUnit
 
+
+    enum class RateUnit(val value: String) {
+        HOURLY("Hourly"), DAILY( "Daily"), WEEKLY("Weekly")
+    }
 
     constructor() {
         //Default
@@ -34,7 +40,9 @@ class Equipment {
     constructor(description: String, ownerId: String,
                 borrowerId: String, category: String,
                 available: Boolean,
-                name: String) {
+                name: String,
+                rate: Double,
+                rateUnit: RateUnit) {
 
         this.description = description
         this.ownerId = ownerId
@@ -43,6 +51,8 @@ class Equipment {
         this.available = available
         this.key = ""
         this.name = name
+        this.ratePrice = rate
+        this.rateUnit = rateUnit
     }
 
     @Exclude
@@ -88,6 +98,8 @@ class Equipment {
         result.put("reservationId", reservationId)
         result.put("duedate", dueDate)
         result.put("geoloc", geoloc)
+        result.put("ratePrice", ratePrice)
+        result.put("rateUnit", rateUnit)
         return result
     }
 

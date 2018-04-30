@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://C:\eQuip\Android\equip-android\eQuip.iml" filepath="C:\eQuip\Android\equip-android\eQuip.iml" />
+      <module fileurl="file://$PROJECT_DIR$/eQuip.iml" filepath="$PROJECT_DIR$/eQuip.iml" />
       <module fileurl="file://$PROJECT_DIR$/equip-android.iml" filepath="$PROJECT_DIR$/equip-android.iml" />
     </modules>
   </component>

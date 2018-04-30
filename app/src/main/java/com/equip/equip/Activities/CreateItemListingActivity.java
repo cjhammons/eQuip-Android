@@ -1,5 +1,6 @@
 package com.equip.equip.Activities;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -7,28 +8,33 @@ import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.media.ThumbnailUtils;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.equip.equip.DataStructures.Equipment;
 import com.equip.equip.DataStructures.User;
 import com.equip.equip.R;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -53,8 +59,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 import ru.dimorinny.floatingtextbutton.FloatingTextButton;
 
@@ -71,6 +77,12 @@ public class CreateItemListingActivity extends Activity {
     private Spinner mCategorySpinner;
     private EditText mNameText;
     private ImageView imageView;
+    private EditText mRateText;
+    private Spinner mRateUnitSpinner;
+    private RadioGroup mLocationRadio;
+    private EditText mLocationEditText;
+
+    boolean useCurrentLocation = true;
 
     private ProgressDialog mProgressDialog;
 
@@ -92,10 +104,14 @@ public class CreateItemListingActivity extends Activity {
     //I shouldn't have to use this but onActivityResult() is misbehaving to the extreme
     private Uri cameraUri;
 
+    private FusedLocationProviderClient mFusedLocationClient;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_item_listing);
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         mDatabase = FirebaseDatabase.getInstance().getReference();
@@ -105,7 +121,7 @@ public class CreateItemListingActivity extends Activity {
         mDatabase.child("categories").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()){
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     mSpinnerList.add(snapshot.getValue().toString());
                 }
                 mCategorySpinner = (Spinner) findViewById(R.id.category_spinner);
@@ -116,7 +132,8 @@ public class CreateItemListingActivity extends Activity {
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {}
+            public void onCancelled(DatabaseError databaseError) {
+            }
         });
         mDescriptionText = (EditText) findViewById(R.id.equipment_description_entry);
         mNameText = (EditText) findViewById(R.id.equipment_name_entry);
@@ -125,16 +142,55 @@ public class CreateItemListingActivity extends Activity {
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new AddPhotoDialogFragment().show(getFragmentManager(), "addPhotoDialog");
+                AlertDialog.Builder builder = new AlertDialog.Builder(CreateItemListingActivity.this);
+                builder.setItems(R.array.add_photo_options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        handlePhoto(which);
+                    }
+                });
+
+                builder.create().show();
             }
         });
+
+        mRateText = (EditText) findViewById(R.id.equipment_rate_entry);
+        mRateUnitSpinner = (Spinner) findViewById(R.id.rate_period_spinner);
+        mLocationRadio = (RadioGroup) findViewById(R.id.location_radio_group);
+        mLocationEditText = (EditText) findViewById(R.id.location_edittext);
+        mLocationEditText.setVisibility(View.GONE);
+
+        mLocationRadio.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                switch (i) {
+                    case R.id.radioButton_otherLocation:
+                        mLocationEditText.setVisibility(View.VISIBLE);
+                        useCurrentLocation = false;
+                        break;
+                    case R.id.radioButton_currentLocation:
+                    default:
+                        useCurrentLocation = true;
+                        mLocationEditText.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        Equipment.RateUnit[] rentalRateUnitArray = Equipment.RateUnit.values();
+        ArrayList<String> rentalRateUnits = new ArrayList<>();
+        for (Equipment.RateUnit rateUnit : rentalRateUnitArray) {
+            rentalRateUnits.add(rateUnit.getValue());
+        }
+        ArrayAdapter<CharSequence> rateUnitAdapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item);
+        rateUnitAdapter.addAll(rentalRateUnits);
+        mRateUnitSpinner.setAdapter(rateUnitAdapter);
 
         FloatingTextButton createListingButton = (FloatingTextButton) findViewById(R.id.create_listing_button);
         createListingButton.setOnClickListener(new CreateListingListener());
 
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setMessage(getString(R.string.uploading_photo));
-        mProgressDialog.setIndeterminate(true);
+        mProgressDialog.setIndeterminate(false);
 
     }
 
@@ -148,20 +204,20 @@ public class CreateItemListingActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode != RESULT_OK) return;
         File thumbFile;
-        switch (requestCode){
+        switch (requestCode) {
 
             case REQUEST_IMAGE_FROM_PHONE:
                 try {
-                InputStream inputStream = this.getContentResolver().openInputStream(data.getData());
-                mPhotoStreams.add(inputStream);
-                Picasso.with(this)
-                        .load(data.getData())
-                        .resize(PHOTO_DISPLAY_DIMENSION, PHOTO_DISPLAY_DIMENSION)
-                        .centerCrop()
-                        .into(imageView);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
+                    InputStream inputStream = this.getContentResolver().openInputStream(data.getData());
+                    mPhotoStreams.add(inputStream);
+                    Picasso.with(this)
+                            .load(data.getData())
+                            .resize(PHOTO_DISPLAY_DIMENSION, PHOTO_DISPLAY_DIMENSION)
+                            .centerCrop()
+                            .into(imageView);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
                 break;
             case REQUEST_IMAGE_CAPTURE:
 //                if (data.getExtras() == null) return;
@@ -178,10 +234,10 @@ public class CreateItemListingActivity extends Activity {
 
     }
 
-    void handlePhoto(int selection){
+    void handlePhoto(int selection) {
         Intent intent;
         int requestCode;
-        switch (selection){
+        switch (selection) {
             //Take Photo
             case REQUEST_IMAGE_CAPTURE:
                 intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
@@ -206,16 +262,16 @@ public class CreateItemListingActivity extends Activity {
                     }
                 }
 
-                if (imageFile != null){
+                if (imageFile != null) {
                     Uri imageUri = FileProvider.getUriForFile(CreateItemListingActivity.this,
                             "com.example.android.fileprovider",
                             imageFile);
-                                imageFile.getParentFile().mkdirs();
-                                try {
-                                    imageFile.createNewFile();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+                    imageFile.getParentFile().mkdirs();
+                    try {
+                        imageFile.createNewFile();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     cameraUri = imageUri;
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
                     Picasso.with(this)
@@ -235,9 +291,10 @@ public class CreateItemListingActivity extends Activity {
         startActivityForResult(intent, requestCode);
     }
 
-    class AddPhotoDialogFragment extends DialogFragment{
+    @Deprecated
+    public class AddPhotoDialogFragment extends DialogFragment {
         @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState){
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
             AlertDialog.Builder builder = new AlertDialog.Builder(CreateItemListingActivity.this);
             builder.setItems(R.array.add_photo_options, new DialogInterface.OnClickListener() {
                 @Override
@@ -258,9 +315,29 @@ public class CreateItemListingActivity extends Activity {
 
         @Override
         public void onClick(View v) {
-            if (mPhotoStreams.size() < 1){
+            if (mPhotoStreams.size() < 1) {
                 Toast.makeText(CreateItemListingActivity.this, getString(R.string.no_photos), Toast.LENGTH_SHORT).show();
                 return;
+            }
+
+            if (mRateText.getText().toString().isEmpty()) {
+                Toast.makeText(CreateItemListingActivity.this, "Enter a rate", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            int selectedRateUnitId = mRateUnitSpinner.getSelectedItemPosition();
+            Equipment.RateUnit selectedRateUnit;
+            switch (selectedRateUnitId) {
+                case 0:
+                default:
+                    selectedRateUnit = Equipment.RateUnit.HOURLY;
+                    break;
+                case 1:
+                    selectedRateUnit = Equipment.RateUnit.DAILY;
+                    break;
+                case 3:
+                    selectedRateUnit = Equipment.RateUnit.WEEKLY;
+                    break;
             }
 
             mEquipment = new Equipment(mDescriptionText.getText().toString(),
@@ -268,18 +345,59 @@ public class CreateItemListingActivity extends Activity {
                     "",
                     mCategorySpinner.getSelectedItem().toString(),
                     true,
-                    mNameText.getText().toString());
+                    mNameText.getText().toString(),
+                    Double.parseDouble(mRateText.getText().toString()),
+                    selectedRateUnit);
             mKey = mDatabase.child("equipment").push().getKey();
             mEquipment.addKey(mKey);
+
+            if (mLocationRadio.getCheckedRadioButtonId() == R.id.radioButton_otherLocation) {
+                List<Address> geocodes = new ArrayList<Address>();
+                Geocoder geocoder = new Geocoder(CreateItemListingActivity.this);
+                try {
+                    geocodes = geocoder.getFromLocationName(mLocationEditText.getText().toString(), 1);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Address addr = new Address(Locale.getDefault());
+                if (geocodes != null) {
+                    addr = geocodes.get(0);
+                    mEquipment.setGeolocation(addr.getLatitude(), addr.getLongitude());
+                }
+            } else {
+                if (ActivityCompat.checkSelfPermission(CreateItemListingActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                        && ActivityCompat.checkSelfPermission(CreateItemListingActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return;
+                } else {
+                    mFusedLocationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            if (location != null) {
+                                mEquipment.setGeolocation(location.getLatitude(), location.getLongitude());
+                            }
+                        }
+                    });
+                }
+            }
+
             updateItemInDatabase();
-            mProgressDialog.show();
+//            mProgressDialog.show();
+
             for (int i = 0; i < mPhotoStreams.size(); i++){
                 StorageReference equipmentImageRef = mStorage.child("equipment/" + mKey +"/" + i + ".jpg");
                 UploadTask uploadTask = equipmentImageRef.putStream(mPhotoStreams.get(i));
                 uploadTask.addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-
+                        mProgressDialog.dismiss();
+                        Toast.makeText(CreateItemListingActivity.this, "upload failed", Toast.LENGTH_SHORT).show();
                     }
                 }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
@@ -310,10 +428,12 @@ public class CreateItemListingActivity extends Activity {
                             + user.getUserId() + "/equipmentListings",
                             userEquipment);
 
-                    mEquipment.setGeolocation(user.getLat(), user.getLng());
+
                     Map<String, Object> equipmentValues = mEquipment.toMap();
                     childUpdates.put("/equipment/" + mKey, equipmentValues);
                     mDatabase.updateChildren(childUpdates);
+                    Toast.makeText(CreateItemListingActivity.this, "Your item is being uploaded", Toast.LENGTH_LONG);
+                    CreateItemListingActivity.this.finish();
                 }
 
                 @Override
