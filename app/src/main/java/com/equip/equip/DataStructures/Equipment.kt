@@ -25,8 +25,8 @@ class Equipment {
     var dueDate: String = ""
     var reservationId: String = ""
     var geoloc: HashMap<String, Double> = HashMap<String, Double>()
-    var ratePrice: Double = 0.0
-    lateinit var rateUnit: RateUnit
+    var ratePrice: Double = -1.0
+    var rateUnit: RateUnit = RateUnit.HOURLY
 
 
     enum class RateUnit(val value: String) {

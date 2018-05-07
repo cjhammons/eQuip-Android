@@ -72,7 +72,7 @@ public abstract class BaseEquipmentListFragment extends Fragment {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                mEquipmentAdapter.notifyDataSetChanged();
+                mEquipmentAdapter.refresh();
                 //todo
                 mSwipeRefreshLayout.setRefreshing(false);
             }
@@ -105,22 +105,31 @@ public abstract class BaseEquipmentListFragment extends Fragment {
                         Equipment equipment = equipmentSnapshot.getValue(Equipment.class);
                         if (equipment.getAvailable()) {
                             remove = false;
+                        } else {
+                            add = false;
                         }
-                        for (Equipment e : mEquipmentList){
-                            if (e.getKey().equals(equipment.getKey())){
-                                add = false;
-                                break;
-                            }
-                        }
-                        if (add) {
+//                        for (Equipment e : mEquipmentList){
+//                            if (e.getKey().equals(equipment.getKey())){
+//                                add = false;
+//                                break;
+//                            }
+//                        }
+                        if (add && !mEquipmentList.contains(equipment)) {
                             mEquipmentList.add(equipment);
                             newElements.add(mEquipmentList.indexOf(equipment));
-                        } else if (remove){
+                            Log.d("Equipment list", "Adding " + dataSnapshot.getKey());
+                        } else if (remove && mEquipmentList.contains(equipment)){
+                            removeElements.add(mEquipmentList.indexOf(equipment));
+                            mEquipmentList.remove(equipment);
+                            Log.d("Equipment list", "Removing " + dataSnapshot.getKey());
 
                         }
                     }
                     for (Integer i : newElements){
                         notifyItemInserted(i);
+                    }
+                    for (Integer i : removeElements){
+                        notifyItemRemoved(i);
                     }
                 }
 
@@ -130,6 +139,11 @@ public abstract class BaseEquipmentListFragment extends Fragment {
                 }
             };
             mEquipmentQuery.addValueEventListener(valueEventListener);
+        }
+
+        public void refresh(){
+            mEquipmentList = new ArrayList<>();
+            notifyDataSetChanged();
         }
 
 

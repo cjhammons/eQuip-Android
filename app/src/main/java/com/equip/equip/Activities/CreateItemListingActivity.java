@@ -83,6 +83,8 @@ public class CreateItemListingActivity extends Activity {
     private EditText mLocationEditText;
 
     boolean useCurrentLocation = true;
+    private String mKey;
+    private boolean mAdded = false;
 
     private ProgressDialog mProgressDialog;
 
@@ -192,11 +194,24 @@ public class CreateItemListingActivity extends Activity {
         mProgressDialog.setMessage(getString(R.string.uploading_photo));
         mProgressDialog.setIndeterminate(false);
 
+        //get key to work with
+        mKey = mDatabase.child("equipment").push().getKey();
+
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (!mAdded){
+            mDatabase.child("equipment/" + mKey).removeValue();
+            mStorage.child("equipment/" + mKey).delete();
+        }
     }
 
     @Override
@@ -230,6 +245,26 @@ public class CreateItemListingActivity extends Activity {
                         .centerCrop()
                         .into(imageView);
                 break;
+        }
+
+        mProgressDialog.show();
+
+        for (int i = 0; i < mPhotoStreams.size(); i++){
+            StorageReference equipmentImageRef = mStorage.child("equipment/" + mKey +"/" + i + ".jpg");
+            UploadTask uploadTask = equipmentImageRef.putStream(mPhotoStreams.get(i));
+            uploadTask.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    mProgressDialog.dismiss();
+                    Toast.makeText(CreateItemListingActivity.this, "upload failed", Toast.LENGTH_SHORT).show();
+                }
+            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    mProgressDialog.dismiss();
+                }
+            });
+
         }
 
     }
@@ -311,7 +346,6 @@ public class CreateItemListingActivity extends Activity {
     private class CreateListingListener implements View.OnClickListener {
 
         private Equipment mEquipment;
-        private String mKey;
 
         @Override
         public void onClick(View v) {
@@ -348,9 +382,10 @@ public class CreateItemListingActivity extends Activity {
                     mNameText.getText().toString(),
                     Double.parseDouble(mRateText.getText().toString()),
                     selectedRateUnit);
-            mKey = mDatabase.child("equipment").push().getKey();
+//            mKey = mDatabase.child("equipment").push().getKey();
             mEquipment.addKey(mKey);
 
+            boolean hasLocation = false;
             if (mLocationRadio.getCheckedRadioButtonId() == R.id.radioButton_otherLocation) {
                 List<Address> geocodes = new ArrayList<Address>();
                 Geocoder geocoder = new Geocoder(CreateItemListingActivity.this);
@@ -359,11 +394,16 @@ public class CreateItemListingActivity extends Activity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                Address addr = new Address(Locale.getDefault());
+                Address addr;
                 if (geocodes != null) {
                     addr = geocodes.get(0);
                     mEquipment.setGeolocation(addr.getLatitude(), addr.getLongitude());
+                } else {
+                    Log.e("Geotagging:", "geocodes is null");
+                    addr = new Address(Locale.getDefault());
+                    mEquipment.setGeolocation(addr.getLatitude(), addr.getLongitude());
                 }
+
             } else {
                 if (ActivityCompat.checkSelfPermission(CreateItemListingActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                         && ActivityCompat.checkSelfPermission(CreateItemListingActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -387,27 +427,13 @@ public class CreateItemListingActivity extends Activity {
                 }
             }
 
-            updateItemInDatabase();
-//            mProgressDialog.show();
-
-            for (int i = 0; i < mPhotoStreams.size(); i++){
-                StorageReference equipmentImageRef = mStorage.child("equipment/" + mKey +"/" + i + ".jpg");
-                UploadTask uploadTask = equipmentImageRef.putStream(mPhotoStreams.get(i));
-                uploadTask.addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        mProgressDialog.dismiss();
-                        Toast.makeText(CreateItemListingActivity.this, "upload failed", Toast.LENGTH_SHORT).show();
-                    }
-                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        mProgressDialog.dismiss();
-                        CreateItemListingActivity.this.finish();
-                    }
-                });
-
+            if (mEquipment.getGeoloc().containsKey("lat") && mEquipment.getGeoloc().containsKey("lng")) {
+                updateItemInDatabase();
+            } else {
+                Log.e("Geocodes:", "Geocodes not found");
+                Toast.makeText(CreateItemListingActivity.this, "Error getting location", Toast.LENGTH_SHORT).show();
             }
+
 
 
         }
@@ -422,17 +448,17 @@ public class CreateItemListingActivity extends Activity {
                     final Map<String, Object> childUpdates = new HashMap<>();
 
                     User user = dataSnapshot.getValue(User.class);
+                    assert user != null;
                     user.addEquipmentListing(mKey);
                     List<String> userEquipment = user.getEquipmentListings();
                     childUpdates.put("users/"
                             + user.getUserId() + "/equipmentListings",
                             userEquipment);
 
-
+                    mAdded = true;
                     Map<String, Object> equipmentValues = mEquipment.toMap();
                     childUpdates.put("/equipment/" + mKey, equipmentValues);
                     mDatabase.updateChildren(childUpdates);
-                    Toast.makeText(CreateItemListingActivity.this, "Your item is being uploaded", Toast.LENGTH_LONG);
                     CreateItemListingActivity.this.finish();
                 }
 

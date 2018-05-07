@@ -31,8 +31,6 @@ import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 import com.borax12.materialdaterangepicker.date.DatePickerDialog;
 
-import org.w3c.dom.Text;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -53,6 +51,8 @@ public class EquipmentDetailActivity extends AppCompatActivity implements DatePi
     private boolean mIsOwner = false;
 
     Reservation mReservation;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +108,9 @@ public class EquipmentDetailActivity extends AppCompatActivity implements DatePi
         TextView availableText = (TextView) findViewById(R.id.available_text);
         final TextView sellerName = (TextView) findViewById(R.id.seller_name);
         final TextView sellerAddress = (TextView) findViewById(R.id.seller_address);
+        TextView mRateTextView = (TextView) findViewById(R.id.rate_amount);
+        TextView mRateUnitTextView = (TextView) findViewById(R.id.rate_unit);
+
 
         FloatingTextButton reserveButton = (FloatingTextButton) findViewById(R.id.reserve_item_fab);
         if (mIsOwner) {
@@ -138,6 +141,12 @@ public class EquipmentDetailActivity extends AppCompatActivity implements DatePi
 
         description.setText(mEquipment.getDescription());
         name.setText(mEquipment.getName());
+
+        if (mEquipment.getRatePrice() < 0.0) {
+           findViewById(R.id.rate_container).setVisibility(View.GONE);
+        }
+        mRateTextView.setText(String.valueOf(mEquipment.getRatePrice()));
+        mRateUnitTextView.setText(String.valueOf(mEquipment.getRateUnit().getValue()));
 
 
         DatabaseReference databaseReference = FirebaseDatabase.getInstance()
