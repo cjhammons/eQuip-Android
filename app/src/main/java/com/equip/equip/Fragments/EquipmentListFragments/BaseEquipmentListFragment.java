@@ -114,6 +114,7 @@ public abstract class BaseEquipmentListFragment extends Fragment {
 //                                break;
 //                            }
 //                        }
+                        //
                         if (add && !mEquipmentList.contains(equipment)) {
                             mEquipmentList.add(equipment);
                             newElements.add(mEquipmentList.indexOf(equipment));
