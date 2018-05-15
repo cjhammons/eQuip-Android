@@ -1,9 +1,13 @@
 package com.equip.equip.Fragments.EquipmentListFragments;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
@@ -23,6 +27,9 @@ import com.equip.equip.Util.location.LocationHelper;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
+import com.firebase.geofire.GeoQueryEventListener;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -37,6 +44,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
 /**
@@ -118,19 +126,13 @@ public abstract class BaseEquipmentListFragment extends Fragment {
                             add = false;
                         }
 
-                        if (BaseEquipmentListFragment.this instanceof NearbyListFragment){
-                            List filterIds = getFilteredIds();
-                            if (filterIds.contains(equipment.key))
-                                add = true;
-                            else
-                                remove = true;
+
+                        if (equipment.getAvailable()) {
+                            remove = false;
                         } else {
-                            if (equipment.getAvailable()) {
-                                remove = false;
-                            } else {
-                                add = false;
-                            }
+                            add = false;
                         }
+
                         if (add && !mEquipmentList.contains(equipment)) {
                             mEquipmentList.add(equipment);
                             newElements.add(mEquipmentList.indexOf(equipment));

@@ -406,6 +406,7 @@ public class CreateItemListingActivity extends Activity {
                     addr = new Address(Locale.getDefault());
                     mEquipment.setGeolocation(addr.getLatitude(), addr.getLongitude());
                 }
+                updateItemInDatabase();
 
             } else {
                 if (ActivityCompat.checkSelfPermission(CreateItemListingActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -452,8 +453,8 @@ public class CreateItemListingActivity extends Activity {
                     .child("users/" + mUser.getUid());
 
             GeoFire geoFire = new GeoFire(mDatabase.getDatabase().getReference().child("geofire"));
-            geoFire.setLocation(mEquipment.getKey(),
-                    new GeoLocation(mEquipment.getGeoloc().get("lat"), mEquipment.getGeoloc().get("lng")),
+            GeoLocation equipmentGeoLocation = new GeoLocation(mEquipment.getGeoloc().get("lat"), mEquipment.getGeoloc().get("lng"));
+            geoFire.setLocation(mEquipment.getKey(), equipmentGeoLocation,
                     new GeoFire.CompletionListener() {
                         @Override
                         public void onComplete(String key, DatabaseError error) {

@@ -1,10 +1,16 @@
 package com.equip.equip.Fragments.EquipmentListFragments;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -13,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.equip.equip.Activities.CreateItemListingActivity;
 import com.equip.equip.Activities.EquipmentDetailActivity;
 import com.equip.equip.DataStructures.Equipment;
 import com.equip.equip.R;
@@ -21,6 +28,8 @@ import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
 import com.firebase.geofire.GeoQueryEventListener;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -29,98 +38,218 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 
-public class NearbyListFragment extends BaseEquipmentListFragment {
+public class NearbyListFragment extends Fragment {
 
-
-    LocationHelper mLocationHelper;
     int mFilterDistance = 50;
-    final double KILOMETER_MULTIIPLIER_CONSTANT = 1.60934;
+    static final double KILOMETER_MULTIIPLIER_CONSTANT = 1.6;
 
+    private RecyclerView mEquipmentRecyclerView;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+
+    private DatabaseReference mDatabaseReference;
+    private EquipmentAdapter mEquipmentAdapter;
+    private StorageReference mStorageReference;
+    private Query mQuery;
 
     @Override
-    public Query getQuery(DatabaseReference databaseReference) {
-        return databaseReference.child("equipment").orderByChild("available").equalTo(true);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mDatabaseReference = FirebaseDatabase.getInstance().getReference();
+        mStorageReference = FirebaseStorage.getInstance().getReference();
     }
-
-
 
     @Override
-    public Fragment getFragmentInstance() {
-        return NearbyListFragment.this;
-    }
-
-
-    public void setLocationHelper(LocationHelper mLocationHelper) {
-        this.mLocationHelper = mLocationHelper;
-        mLocationHelper.buildGoogleApiClient();
-        mLocationHelper.connectApiClient();
-        mLocationHelper.getLocation();
-    }
-
-    public LocationHelper getLocationHelper() {
-        return mLocationHelper;
-    }
-
-    public void setFilterDistance(int filterDistance) {
-        this.mFilterDistance = filterDistance;
-    }
-
-    public int getFilterDistance() {
-        return mFilterDistance;
-    }
-
-    public void setFilterLocation(String address){
-
-    }
-
-    public ArrayList<String> getFilteredIds() {
-        final ArrayList<String> list = new ArrayList<>();
-
-        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-        GeoFire geoFire = new GeoFire(databaseReference.child("geofire"));
-        mLocationHelper.buildGoogleApiClient();
-        mLocationHelper.connectApiClient();
-        mLocationHelper.getLocation();
-        Location location = mLocationHelper.getLastLocation();
-        Double lat = location.getLatitude();
-        Double lng = location.getLongitude();
-        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(lat, lng),
-                mFilterDistance * KILOMETER_MULTIIPLIER_CONSTANT);
-
-        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_dashboard_list, container, false);
+        mEquipmentRecyclerView = (RecyclerView) view.findViewById(R.id.item_list);
+        mEquipmentRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
+        mEquipmentAdapter = new EquipmentAdapter();
+        mEquipmentRecyclerView.setAdapter(mEquipmentAdapter);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeRefreshLayout);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onKeyEntered(String key, GeoLocation location) {
-                list.add(key);
-            }
-
-            @Override
-            public void onKeyExited(String key) {
-
-            }
-
-            @Override
-            public void onKeyMoved(String key, GeoLocation location) {
-
-            }
-
-            @Override
-            public void onGeoQueryReady() {
-
-            }
-
-            @Override
-            public void onGeoQueryError(DatabaseError error) {
-
+            public void onRefresh() {
+                mEquipmentAdapter.refresh();
+                //todo
+                mSwipeRefreshLayout.setRefreshing(false);
             }
         });
+        return view;
+    }
 
-        return list;
+
+    public class EquipmentAdapter extends RecyclerView.Adapter<EquipmentAdapter.ViewHolder> {
+
+        private static final String LOG_TAG = "EquipmentRecyclerAdapter";
+        private Query mEquipmentQuery;
+        private ArrayList<Equipment> mEquipmentList;
+
+        private EquipmentAdapter(){
+            mEquipmentList = new ArrayList<>();
+            FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(Objects.requireNonNull(getActivity()));
+
+
+            final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+            final GeoFire geoFire = new GeoFire(databaseReference.child("geofire"));
+
+            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                Log.d("EquipmentAdapter:", "No permission to use location");
+
+            } else {
+                Log.d("EquipmentAdapter:", "Has location permisssion");
+                fusedLocationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()),
+                                mFilterDistance * KILOMETER_MULTIIPLIER_CONSTANT);
+
+                        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+                            @Override
+                            public void onKeyEntered(String key, GeoLocation location) {
+                                databaseReference.child("equipment/" + key).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        Equipment e = dataSnapshot.getValue(Equipment.class);
+                                        if (!mEquipmentList.contains(e))
+                                            mEquipmentList.add(e);
+                                        notifyDataSetChanged();
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onKeyExited(String key) {
+                                databaseReference.child("equipment/" + key).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        Equipment e = dataSnapshot.getValue(Equipment.class);
+                                        if (mEquipmentList.contains(e))
+                                            mEquipmentList.remove(e);
+                                        notifyDataSetChanged();
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onKeyMoved(String key, GeoLocation location) {
+
+                            }
+
+                            @Override
+                            public void onGeoQueryReady() {
+
+                            }
+
+                            @Override
+                            public void onGeoQueryError(DatabaseError error) {
+                                Log.e("GeoQuery: ", error.getMessage());
+                            }
+                        });
+                    }
+                });
+            }
+        }
+
+        public void refresh(){
+            notifyDataSetChanged();
+        }
+
+
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.equipment_list_item, viewGroup, false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
+            Log.d(LOG_TAG, "onBindViewHolder (" + position + ")");
+            final Equipment equipment = mEquipmentList.get(position);
+            holder.mImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(getContext(), EquipmentDetailActivity.class);
+                    intent.putExtra("equipmentKey", equipment.getKey());
+                    startActivity(intent);
+                }
+            });
+            //Take first image's thumbnail. This can be changed
+            String path = "equipment/" + equipment.getKey() + "/thumbnail_0.jpg";
+            mStorageReference.child(path).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    loadImage(holder, uri);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.e(LOG_TAG + ": load thumbnail", e.getMessage());
+                }
+            });
+
+
+        }
+
+        /**
+         * Loads the image using picasso
+         * @param holder
+         * @param uri
+         */
+        void loadImage(ViewHolder holder, Uri uri){
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+            int dimension = (displayMetrics.widthPixels / 3);
+            Picasso.with(getActivity())
+                    .load(uri)
+                    .resize(dimension, dimension)
+                    .centerCrop()
+                    .into(holder.mImage);
+        }
+
+        @Override
+        public int getItemCount() {
+            return mEquipmentList.size();
+        }
+
+        class ViewHolder extends RecyclerView.ViewHolder{
+            private ImageView mImage;
+            private ImageView mReserveNotification;
+
+            private ViewHolder(View itemView) {
+                super(itemView);
+                mImage = (ImageView) itemView.findViewById(R.id.equipment_image);
+                mReserveNotification = (ImageView) itemView.findViewById(R.id.reserve_notification);
+            }
+        }
     }
 
 }

@@ -221,7 +221,6 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
     @Override
     public void onDashboardSelected() {
         NearbyListFragment nearbyListFragment = new NearbyListFragment();
-        nearbyListFragment.setLocationHelper(mLocationHelper);
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, nearbyListFragment).addToBackStack("Dashboard").commit();
         getSupportActionBar().setTitle("Nearby Equipment");
 
