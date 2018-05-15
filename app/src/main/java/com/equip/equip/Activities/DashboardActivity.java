@@ -1,5 +1,8 @@
 package com.equip.equip.Activities;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.DialogFragment;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -16,10 +19,16 @@ import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.RadioGroup;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.algolia.instantsearch.helpers.InstantSearch;
 import com.algolia.instantsearch.helpers.Searcher;
@@ -125,7 +134,7 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-//        inflater.inflate(R.menu.menu, menu);
+        inflater.inflate(R.menu.menu, menu);
 
 //        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 //        SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
@@ -138,6 +147,16 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.filter:
+            default:
+                DialogFragment filterFragment = new FilterFragment();
+                filterFragment.show(getFragmentManager(), "Filter Fragment");
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     private void setupDrawer(){
         DrawerMenuItem search = new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_SEARCH);
@@ -290,6 +309,82 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
         public void onClick(View v) {
             Intent intent = new Intent(DashboardActivity.this, CreateItemListingActivity.class);
             startActivity(intent);
+        }
+    }
+
+    private class FilterFragment extends DialogFragment{
+        int rawSelected = 5;
+
+        @Nullable
+        @Override
+        public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+            super.onCreateView(inflater, container, savedInstanceState);
+            View v = inflater.inflate(R.layout.fragment_filter_dialog, container, false);
+
+
+            final TextView distanceText = v.findViewById(R.id.miles_text);
+
+            SeekBar distanceBar = v.findViewById(R.id.distance_seek_bar);
+            distanceBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @SuppressLint("SetTextI18n")
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    rawSelected = progress;
+                    distanceText.setText(rawSelected * 25 + " miles");
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            });
+
+            final EditText addressText = v.findViewById(R.id.filter_custom_address);
+            addressText.setVisibility(View.GONE);
+
+            final RadioGroup radioGroup = v.findViewById(R.id.filter_radio);
+
+            radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(RadioGroup group, int checkedId) {
+                    switch (checkedId){
+                        case R.id.current_location:
+                            addressText.setVisibility(View.GONE);
+                            break;
+                        case R.id.other_location:
+                            addressText.setVisibility(View.VISIBLE);
+                            break;
+                    }
+                }
+            });
+
+            v.findViewById(R.id.filter_button).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    NearbyListFragment nearbyListFragment = new NearbyListFragment();
+                    nearbyListFragment.setFilterDistance(rawSelected * 25);
+                    if (radioGroup.getCheckedRadioButtonId() == R.id.other_location){
+                        nearbyListFragment.setCustomAddr(addressText.getText().toString());
+                    }
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, nearbyListFragment).addToBackStack("Dashboard").commit();
+                    getSupportActionBar().setTitle("Nearby Equipment");
+                    FilterFragment.this.dismiss();
+                }
+            });
+
+            v.findViewById(R.id.filter_cancel_button).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    FilterFragment.this.dismiss();
+                }
+            });
+
+            return v;
         }
     }
 

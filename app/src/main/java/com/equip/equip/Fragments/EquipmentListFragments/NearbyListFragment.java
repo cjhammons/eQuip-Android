@@ -3,6 +3,8 @@ package com.equip.equip.Fragments.EquipmentListFragments;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -42,8 +44,10 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 
@@ -51,6 +55,8 @@ public class NearbyListFragment extends Fragment {
 
     int mFilterDistance = 50;
     static final double KILOMETER_MULTIIPLIER_CONSTANT = 1.6;
+    boolean useCurrentLocation = true;
+    String customAddr;
 
     private RecyclerView mEquipmentRecyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -88,95 +94,126 @@ public class NearbyListFragment extends Fragment {
         return view;
     }
 
+    public void setFilterDistance(int mFilterDistance) {
+        this.mFilterDistance = mFilterDistance;
+    }
+
+    public void setCustomAddr(String customAddr) {
+        this.customAddr = customAddr;
+        useCurrentLocation = false;
+    }
 
     public class EquipmentAdapter extends RecyclerView.Adapter<EquipmentAdapter.ViewHolder> {
 
         private static final String LOG_TAG = "EquipmentRecyclerAdapter";
         private Query mEquipmentQuery;
         private ArrayList<Equipment> mEquipmentList;
-
+        DatabaseReference databaseReference;
         private EquipmentAdapter(){
             mEquipmentList = new ArrayList<>();
             FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(Objects.requireNonNull(getActivity()));
 
 
-            final DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+            databaseReference = FirebaseDatabase.getInstance().getReference();
+            if (useCurrentLocation) {
+                if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                        && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    Log.d("EquipmentAdapter:", "No permission to use location");
+
+                } else {
+                    Log.d("EquipmentAdapter:", "Has location permisssion");
+                    fusedLocationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            doGeoQuery(location.getLatitude(), location.getLongitude());
+                        }
+                    });
+                }
+            } else {
+                List<Address> geocodes = new ArrayList<Address>();
+                Geocoder geocoder = new Geocoder(getActivity());
+                try {
+                    geocodes = geocoder.getFromLocationName(customAddr, 1);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Address addr;
+                if (geocodes != null) {
+                    addr = geocodes.get(0);
+                } else {
+                    Log.e("Geotagging:", "geocodes is null");
+                    addr = new Address(Locale.getDefault());
+                }
+                doGeoQuery(addr.getLatitude(), addr.getLongitude());
+            }
+
+        }
+
+        void doGeoQuery(double lat, double lng) {
             final GeoFire geoFire = new GeoFire(databaseReference.child("geofire"));
 
-            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                    && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                Log.d("EquipmentAdapter:", "No permission to use location");
+            GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(lat, lng),
+                    mFilterDistance * KILOMETER_MULTIIPLIER_CONSTANT);
 
-            } else {
-                Log.d("EquipmentAdapter:", "Has location permisssion");
-                fusedLocationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(location.getLatitude(), location.getLongitude()),
-                                mFilterDistance * KILOMETER_MULTIIPLIER_CONSTANT);
+            geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+                @Override
+                public void onKeyEntered(String key, GeoLocation location) {
+                    databaseReference.child("equipment/" + key).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Equipment e = dataSnapshot.getValue(Equipment.class);
+                            if (!mEquipmentList.contains(e))
+                                mEquipmentList.add(e);
+                            notifyDataSetChanged();
+                        }
 
-                        geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
-                            @Override
-                            public void onKeyEntered(String key, GeoLocation location) {
-                                databaseReference.child("equipment/" + key).addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                        Equipment e = dataSnapshot.getValue(Equipment.class);
-                                        if (!mEquipmentList.contains(e))
-                                            mEquipmentList.add(e);
-                                        notifyDataSetChanged();
-                                    }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
+                }
 
-                                    }
-                                });
-                            }
+                @Override
+                public void onKeyExited(String key) {
+                    databaseReference.child("equipment/" + key).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Equipment e = dataSnapshot.getValue(Equipment.class);
+                            if (mEquipmentList.contains(e))
+                                mEquipmentList.remove(e);
+                            notifyDataSetChanged();
+                        }
 
-                            @Override
-                            public void onKeyExited(String key) {
-                                databaseReference.child("equipment/" + key).addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                        Equipment e = dataSnapshot.getValue(Equipment.class);
-                                        if (mEquipmentList.contains(e))
-                                            mEquipmentList.remove(e);
-                                        notifyDataSetChanged();
-                                    }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
+                }
 
-                                    }
-                                });
-                            }
+                @Override
+                public void onKeyMoved(String key, GeoLocation location) {
 
-                            @Override
-                            public void onKeyMoved(String key, GeoLocation location) {
+                }
 
-                            }
+                @Override
+                public void onGeoQueryReady() {
 
-                            @Override
-                            public void onGeoQueryReady() {
+                }
 
-                            }
-
-                            @Override
-                            public void onGeoQueryError(DatabaseError error) {
-                                Log.e("GeoQuery: ", error.getMessage());
-                            }
-                        });
-                    }
-                });
-            }
+                @Override
+                public void onGeoQueryError(DatabaseError error) {
+                    Log.e("GeoQuery: ", error.getMessage());
+                }
+            });
         }
 
         public void refresh(){
