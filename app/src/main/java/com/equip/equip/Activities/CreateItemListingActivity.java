@@ -33,8 +33,11 @@ import android.widget.Toast;
 import com.equip.equip.DataStructures.Equipment;
 import com.equip.equip.DataStructures.User;
 import com.equip.equip.R;
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -421,20 +424,25 @@ public class CreateItemListingActivity extends Activity {
                         public void onSuccess(Location location) {
                             if (location != null) {
                                 mEquipment.setGeolocation(location.getLatitude(), location.getLongitude());
+                                updateItemInDatabase();
                             }
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.e("Geocodes:", "Geocodes not found");
+                            Toast.makeText(CreateItemListingActivity.this, "Error getting location", Toast.LENGTH_SHORT).show();
+
+                        }
+                    }).addOnCanceledListener(new OnCanceledListener() {
+                        @Override
+                        public void onCanceled() {
+                            Log.e("Geocodes:", "Geocodes not found");
+                            Toast.makeText(CreateItemListingActivity.this, "Error getting location", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
             }
-
-            if (mEquipment.getGeoloc().containsKey("lat") && mEquipment.getGeoloc().containsKey("lng")) {
-                updateItemInDatabase();
-            } else {
-                Log.e("Geocodes:", "Geocodes not found");
-                Toast.makeText(CreateItemListingActivity.this, "Error getting location", Toast.LENGTH_SHORT).show();
-            }
-
-
 
         }
 
@@ -442,33 +450,52 @@ public class CreateItemListingActivity extends Activity {
 
             final DatabaseReference userReference = mDatabase.getDatabase().getReference()
                     .child("users/" + mUser.getUid());
-            final ValueEventListener listener = new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    final Map<String, Object> childUpdates = new HashMap<>();
 
-                    User user = dataSnapshot.getValue(User.class);
-                    assert user != null;
-                    user.addEquipmentListing(mKey);
-                    List<String> userEquipment = user.getEquipmentListings();
-                    childUpdates.put("users/"
-                            + user.getUserId() + "/equipmentListings",
-                            userEquipment);
+            GeoFire geoFire = new GeoFire(mDatabase.getDatabase().getReference().child("geofire"));
+            geoFire.setLocation(mEquipment.getKey(),
+                    new GeoLocation(mEquipment.getGeoloc().get("lat"), mEquipment.getGeoloc().get("lng")),
+                    new GeoFire.CompletionListener() {
+                        @Override
+                        public void onComplete(String key, DatabaseError error) {
+                            if (error != null) {
+                                Log.e("geofire: ","Error getting geofire location");
+                                Toast.makeText(CreateItemListingActivity.this,  "Error with location", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Log.d("geofire: ", "success");
 
-                    mAdded = true;
-                    Map<String, Object> equipmentValues = mEquipment.toMap();
-                    childUpdates.put("/equipment/" + mKey, equipmentValues);
-                    mDatabase.updateChildren(childUpdates);
-                    CreateItemListingActivity.this.finish();
-                }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Log.e(TAG, databaseError.getMessage());
-                }
-            };
+                                final ValueEventListener listener = new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        final Map<String, Object> childUpdates = new HashMap<>();
 
-            userReference.addListenerForSingleValueEvent(listener);
+                                        User user = dataSnapshot.getValue(User.class);
+                                        assert user != null;
+                                        user.addEquipmentListing(mKey);
+                                        List<String> userEquipment = user.getEquipmentListings();
+                                        childUpdates.put("users/"
+                                                        + user.getUserId() + "/equipmentListings",
+                                                userEquipment);
+
+                                        mAdded = true;
+                                        Map<String, Object> equipmentValues = mEquipment.toMap();
+                                        childUpdates.put("/equipment/" + mKey, equipmentValues);
+                                        mDatabase.updateChildren(childUpdates);
+                                        CreateItemListingActivity.this.finish();
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                        Log.e(TAG, databaseError.getMessage());
+                                    }
+                                };
+
+                                userReference.addListenerForSingleValueEvent(listener);
+                            }
+                        }
+                    });
+
+
         }
     }
 

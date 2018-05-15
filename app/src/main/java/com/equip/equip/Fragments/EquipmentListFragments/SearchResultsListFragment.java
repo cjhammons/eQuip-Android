@@ -5,6 +5,8 @@ import android.support.v4.app.Fragment;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 
+import java.util.ArrayList;
+
 /**
  * Created by Curtis on 11/20/2017.
  */
@@ -23,6 +25,11 @@ public class SearchResultsListFragment extends BaseEquipmentListFragment {
             return databaseReference.child("equipment");
         }
         return mQuery;
+    }
+
+    @Override
+    public ArrayList<String> getFilteredIds() {
+        return null;
     }
 
     @Override

@@ -19,6 +19,10 @@ import android.widget.Toast;
 import com.equip.equip.Activities.EquipmentDetailActivity;
 import com.equip.equip.DataStructures.Equipment;
 import com.equip.equip.R;
+import com.equip.equip.Util.location.LocationHelper;
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
+import com.firebase.geofire.GeoQuery;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -33,6 +37,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 /**
  * Created by curtis on 7/19/17.
@@ -84,21 +89,25 @@ public abstract class BaseEquipmentListFragment extends Fragment {
 
     public abstract Query getQuery(DatabaseReference databaseReference);
 
-    private class EquipmentAdapter extends RecyclerView.Adapter<EquipmentAdapter.ViewHolder> {
+    public abstract ArrayList<String> getFilteredIds();
+
+
+    public class EquipmentAdapter extends RecyclerView.Adapter<EquipmentAdapter.ViewHolder> {
 
         private static final String LOG_TAG = "EquipmentRecyclerAdapter";
         private Query mEquipmentQuery;
         private ArrayList<Equipment> mEquipmentList;
 
         private EquipmentAdapter(Query equipmentQuery){
-            this.mEquipmentQuery = equipmentQuery;
             mEquipmentList = new ArrayList<>();
+            this.mEquipmentQuery = equipmentQuery;
             ValueEventListener valueEventListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     final ArrayList<Integer> newElements = new ArrayList<>();
                     final ArrayList<Integer> removeElements = new ArrayList<>();
                     //TODO removing
+
                     for (DataSnapshot equipmentSnapshot: dataSnapshot.getChildren()) {
                         boolean add = true;
                         boolean remove = true;
@@ -108,13 +117,20 @@ public abstract class BaseEquipmentListFragment extends Fragment {
                         } else {
                             add = false;
                         }
-//                        for (Equipment e : mEquipmentList){
-//                            if (e.getKey().equals(equipment.getKey())){
-//                                add = false;
-//                                break;
-//                            }
-//                        }
-                        //
+
+                        if (BaseEquipmentListFragment.this instanceof NearbyListFragment){
+                            List filterIds = getFilteredIds();
+                            if (filterIds.contains(equipment.key))
+                                add = true;
+                            else
+                                remove = true;
+                        } else {
+                            if (equipment.getAvailable()) {
+                                remove = false;
+                            } else {
+                                add = false;
+                            }
+                        }
                         if (add && !mEquipmentList.contains(equipment)) {
                             mEquipmentList.add(equipment);
                             newElements.add(mEquipmentList.indexOf(equipment));
@@ -143,7 +159,7 @@ public abstract class BaseEquipmentListFragment extends Fragment {
         }
 
         public void refresh(){
-            mEquipmentList = new ArrayList<>();
+//            mEquipmentList = BaseEquipmentListFragment.this.getEquipment();
             notifyDataSetChanged();
         }
 

@@ -10,6 +10,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 
+import java.util.ArrayList;
+
 /**
  * Created by Curtis on 8/21/2017.
  *
@@ -23,6 +25,11 @@ public class MyEquipmentListFragment extends BaseEquipmentListFragment {
     public Query getQuery(DatabaseReference databaseReference) {
         String uId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         return databaseReference.child("equipment").orderByChild("ownerId").equalTo(uId);
+    }
+
+    @Override
+    public ArrayList<String> getFilteredIds() {
+        return null;
     }
 
     @Override

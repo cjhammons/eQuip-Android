@@ -98,11 +98,12 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
         mUser = FirebaseAuth.getInstance().getCurrentUser();
 
 
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment_container, new NearbyListFragment())
-                .addToBackStack("Nearby")
-                .commit();
+//        getSupportFragmentManager()
+//                .beginTransaction()
+//                .replace(R.id.fragment_container, new NearbyListFragment())
+//                .addToBackStack("Nearby")
+//                .commit();
+        onDashboardSelected();
         setupDrawer();
 
     }
@@ -219,8 +220,11 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
 
     @Override
     public void onDashboardSelected() {
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new NearbyListFragment()).addToBackStack("Dashboard").commit();
-        getSupportActionBar().setTitle(getString(R.string.app_name));
+        NearbyListFragment nearbyListFragment = new NearbyListFragment();
+        nearbyListFragment.setLocationHelper(mLocationHelper);
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, nearbyListFragment).addToBackStack("Dashboard").commit();
+        getSupportActionBar().setTitle("Nearby Equipment");
+
         mDrawer.closeDrawers();
         mFab.setVisibility(View.VISIBLE);
     }

@@ -73,6 +73,7 @@ dependencies {
     api 'com.github.dimorinny:floating-text-button:0.0.2'
     api 'com.borax12.materialdaterangepicker:library:1.9'
     api 'com.algolia:instantsearch-android:1.+'
+    api 'com.firebase:geofire-android:2.3.1'
 
 
     testImplementation 'junit:junit:4.12'
