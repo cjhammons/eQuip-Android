@@ -51,12 +51,16 @@ import java.util.Locale;
 import java.util.Objects;
 
 
-public class NearbyListFragment extends Fragment {
+public class FilterListFragment extends Fragment {
 
     int mFilterDistance = 50;
     static final double KILOMETER_MULTIIPLIER_CONSTANT = 1.6;
     boolean useCurrentLocation = true;
     String customAddr;
+
+    boolean priceFilter = false;
+    double priceFloor;
+    double priceCeiling;
 
     private RecyclerView mEquipmentRecyclerView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -101,6 +105,17 @@ public class NearbyListFragment extends Fragment {
     public void setCustomAddr(String customAddr) {
         this.customAddr = customAddr;
         useCurrentLocation = false;
+    }
+
+    public void setPriceFilter(boolean priceFilter) {
+        this.priceFilter = priceFilter;
+    }
+
+    public void setPriceRange(double priceFloor, double priceCeiling){
+        if (priceCeiling > priceFloor){
+            this.priceFloor = priceFloor;
+            this.priceCeiling = priceCeiling;
+        }
     }
 
     public class EquipmentAdapter extends RecyclerView.Adapter<EquipmentAdapter.ViewHolder> {
@@ -162,58 +177,110 @@ public class NearbyListFragment extends Fragment {
             GeoQuery geoQuery = geoFire.queryAtLocation(new GeoLocation(lat, lng),
                     mFilterDistance * KILOMETER_MULTIIPLIER_CONSTANT);
 
-            geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
-                @Override
-                public void onKeyEntered(String key, GeoLocation location) {
-                    databaseReference.child("equipment/" + key).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            Equipment e = dataSnapshot.getValue(Equipment.class);
-                            if (!mEquipmentList.contains(e))
-                                mEquipmentList.add(e);
-                            notifyDataSetChanged();
+            final Query equipmentQuery;
+            if (priceFilter){
+                equipmentQuery = databaseReference.child("equipment").orderByChild("ratePrice").startAt(priceFloor).endAt(priceCeiling);
+                equipmentQuery.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        final ArrayList<Integer> newElements = new ArrayList<>();
+                        final ArrayList<Integer> removeElements = new ArrayList<>();
+                        //TODO removing
+
+                        for (DataSnapshot equipmentSnapshot: dataSnapshot.getChildren()) {
+                            boolean add = true;
+                            boolean remove = true;
+                            Equipment equipment = equipmentSnapshot.getValue(Equipment.class);
+                            if (equipment.getAvailable()) {
+                                remove = false;
+                            } else {
+                                add = false;
+                            }
+
+                            if (add && !mEquipmentList.contains(equipment)) {
+                                mEquipmentList.add(equipment);
+                                newElements.add(mEquipmentList.indexOf(equipment));
+                                Log.d("Equipment list", "Adding " + dataSnapshot.getKey());
+                            } else if (remove && mEquipmentList.contains(equipment)){
+                                removeElements.add(mEquipmentList.indexOf(equipment));
+                                mEquipmentList.remove(equipment);
+                                Log.d("Equipment list", "Removing " + dataSnapshot.getKey());
+
+                            }
                         }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
+                        for (Integer i : newElements){
+                            notifyItemInserted(i);
                         }
-                    });
-                }
-
-                @Override
-                public void onKeyExited(String key) {
-                    databaseReference.child("equipment/" + key).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            Equipment e = dataSnapshot.getValue(Equipment.class);
-                            if (mEquipmentList.contains(e))
-                                mEquipmentList.remove(e);
-                            notifyDataSetChanged();
+                        for (Integer i : removeElements){
+                            notifyItemRemoved(i);
                         }
+                    }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-                        }
-                    });
-                }
+                    }
+                });
+            } else {
+                equipmentQuery = databaseReference.child("equipment");
+                geoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
+                    @Override
+                    public void onKeyEntered(String key, GeoLocation location) {
+                        equipmentQuery.orderByChild("key").equalTo(key).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshots) {
+                                for (DataSnapshot snapshot : dataSnapshots.getChildren()){
+                                    Equipment e = snapshot.getValue(Equipment.class);
+                                    if (!mEquipmentList.contains(e))
+                                        mEquipmentList.add(e);
+                                    notifyDataSetChanged();
+                                }
 
-                @Override
-                public void onKeyMoved(String key, GeoLocation location) {
+                            }
 
-                }
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
 
-                @Override
-                public void onGeoQueryReady() {
+                            }
+                        });
+                    }
 
-                }
+                    @Override
+                    public void onKeyExited(String key) {
+                        databaseReference.child("equipment/" + key).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                Equipment e = dataSnapshot.getValue(Equipment.class);
+                                if (mEquipmentList.contains(e))
+                                    mEquipmentList.remove(e);
+                                notifyDataSetChanged();
+                            }
 
-                @Override
-                public void onGeoQueryError(DatabaseError error) {
-                    Log.e("GeoQuery: ", error.getMessage());
-                }
-            });
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onKeyMoved(String key, GeoLocation location) {
+
+                    }
+
+                    @Override
+                    public void onGeoQueryReady() {
+
+                    }
+
+                    @Override
+                    public void onGeoQueryError(DatabaseError error) {
+                        Log.e("GeoQuery: ", error.getMessage());
+                    }
+                });
+            }
+
+
         }
 
         public void refresh(){

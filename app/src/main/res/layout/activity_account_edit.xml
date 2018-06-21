@@ -21,7 +21,8 @@
         <ImageView
             android:id="@+id/account_profile_pic"
             android:layout_width="match_parent"
-            android:layout_height="240dp" />
+            android:layout_height="240dp"
+            android:src="@drawable/outline_insert_photo_black_48dp"/>
 
         <LinearLayout
             android:id="@+id/attributes_container"
@@ -81,11 +82,38 @@
                     android:inputType="phone" />
             </android.support.design.widget.TextInputLayout>
 
+            <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                android:text="Payment Info"/>
+
+            <!--<com.stripe.android.view.CardInputWidget-->
+                <!--android:id="@+id/card_input_widget"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--/>-->
+
+            <Button
+                android:id="@+id/manage_payments"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_marginTop="24dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="64dp"
+                android:layout_marginRight="64dp"
+                android:background="@drawable/curved_button"
+                android:backgroundTint="@color/colorAccentDark"
+                android:text="Manage Payment Methods"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+
             <Button
                 android:id="@+id/confirm_changes"
                 android:layout_width="match_parent"
                 android:layout_height="36dp"
                 android:layout_centerHorizontal="true"
+                android:layout_marginTop="24dp"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="64dp"
                 android:layout_marginRight="64dp"

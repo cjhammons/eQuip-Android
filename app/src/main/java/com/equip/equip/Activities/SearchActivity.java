@@ -31,33 +31,33 @@ public class SearchActivity extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
-
-        mSearcher = Searcher.create(EquipApplication.ALGOLIA_APP_ID,
-                EquipApplication.ALGOLIA_SEARCH_API_KEY,
-                EquipApplication.ALGOLIA_EQUIPMENT_INDEX_NAME);
-
-        mHelper = new InstantSearch(this, mSearcher);
-
-        mHitListView = findViewById(R.id.search_hits);
-        mHitListView.setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
-            @Override
-            public void onItemClick(RecyclerView recyclerView, int position, View v) {
-                JSONObject hit = mHitListView.get(position);
-                String key = "";
-                try {
-                    key = hit.getString("key");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                if (key.equals("")) {
-                    return;
-                }
-                Intent intent = new Intent(SearchActivity.this, EquipmentDetailActivity.class);
-                intent.putExtra("equipmentKey", key);
-                startActivity(intent);
-            }
-        });
+//        setContentView(R.layout.activity_search);
+//
+//        mSearcher = Searcher.create(EquipApplication.ALGOLIA_APP_ID,
+//                EquipApplication.ALGOLIA_SEARCH_API_KEY,
+//                EquipApplication.ALGOLIA_EQUIPMENT_INDEX_NAME);
+//
+//        mHelper = new InstantSearch(this, mSearcher);
+//
+//        mHitListView = findViewById(R.id.search_hits);
+//        mHitListView.setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(RecyclerView recyclerView, int position, View v) {
+//                JSONObject hit = mHitListView.get(position);
+//                String key = "";
+//                try {
+//                    key = hit.getString("key");
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//                if (key.equals("")) {
+//                    return;
+//                }
+//                Intent intent = new Intent(SearchActivity.this, EquipmentDetailActivity.class);
+//                intent.putExtra("equipmentKey", key);
+//                startActivity(intent);
+//            }
+//        });
     }
 
 

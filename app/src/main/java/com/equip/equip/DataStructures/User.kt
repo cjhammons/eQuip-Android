@@ -2,7 +2,11 @@ package com.equip.equip.DataStructures
 
 import com.google.firebase.database.Exclude
 import com.google.firebase.database.IgnoreExtraProperties
-import java.util.HashMap
+import com.google.gson.JsonObject
+import com.stripe.android.model.Card
+import com.stripe.android.model.Token
+import org.json.JSONObject
+import java.util.*
 
 /**
  * Created by Curtis on 8/16/2017.
@@ -15,14 +19,13 @@ class User {
     var picUrl: String = ""
     var googleConnected: Boolean = false
     var facebookConnected: Boolean = false
-    var notificationTokens: MutableList<String>? = ArrayList<String>()
+    var notificationTokens: MutableList<String> = ArrayList<String>()
     var isVendor: Boolean = false
     var reservationIds: MutableList<String> = ArrayList<String>()
     var rentalIds: MutableList<String> = ArrayList<String>()
     var historicRentalIds: MutableList<String> = ArrayList<String>()
     var phoneNumber: String = ""
     var geoloc: HashMap<String, Double> = HashMap<String, Double>()
-
 
 
     //Vendor only
@@ -128,6 +131,8 @@ class User {
         if (notificationTokens!!.contains(token))
             notificationTokens!!.remove(token)
     }
+
+
 
     @Exclude
     fun toMap(): Map<String, Any> {

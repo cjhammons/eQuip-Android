@@ -22,11 +22,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.iid.FirebaseInstanceId;
+import com.stripe.android.PaymentConfiguration;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import io.fabric.sdk.android.Fabric;
+
+import static com.equip.equip.EquipApplication.STRIPE_PUBLISHABLE_KEY;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -39,6 +42,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Fabric.with(this, new Crashlytics());
+        PaymentConfiguration.init(STRIPE_PUBLISHABLE_KEY);
         setContentView(R.layout.activity_login);
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -65,11 +69,6 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         };
-
-
-
-
-
     }
 
     @Override

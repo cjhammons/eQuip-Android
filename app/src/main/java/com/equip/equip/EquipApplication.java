@@ -14,6 +14,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.stripe.android.PaymentConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,8 @@ public class EquipApplication extends Application {
     public static String ALGOLIA_APP_ID = "0Z8PY28AQ6";
     public static String ALGOLIA_SEARCH_API_KEY = "7f8627aebb14a9b51ad64d74b48438e5";
     public static String ALGOLIA_EQUIPMENT_INDEX_NAME = "EQUIPMENT";
+
+    public static String STRIPE_PUBLISHABLE_KEY = "pk_live_rTePRjq3OlpPTsiQL68kykNP";
 
     @Override
     public void onCreate() {

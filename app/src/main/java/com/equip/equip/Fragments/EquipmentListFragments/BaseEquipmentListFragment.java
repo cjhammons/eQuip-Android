@@ -120,18 +120,11 @@ public abstract class BaseEquipmentListFragment extends Fragment {
                         boolean add = true;
                         boolean remove = true;
                         Equipment equipment = equipmentSnapshot.getValue(Equipment.class);
-                        if (equipment.getAvailable()) {
-                            remove = false;
-                        } else {
-                            add = false;
-                        }
-
-
-                        if (equipment.getAvailable()) {
-                            remove = false;
-                        } else {
-                            add = false;
-                        }
+//                        if (equipment.getAvailable()) {
+//                            remove = false;
+//                        } else {
+//                            add = false;
+//                        }
 
                         if (add && !mEquipmentList.contains(equipment)) {
                             mEquipmentList.add(equipment);

@@ -71,7 +71,6 @@ import ru.dimorinny.floatingtextbutton.FloatingTextButton;
 /**
  * Created by curtis on 7/19/17.
  */
-//TODO location tagging
 public class CreateItemListingActivity extends Activity {
 
     public static final String TAG = "CreateListing";

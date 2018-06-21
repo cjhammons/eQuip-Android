@@ -1,12 +1,10 @@
 package com.equip.equip.Activities;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
 import android.provider.SearchRecentSuggestions;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -16,7 +14,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,18 +22,20 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.algolia.instantsearch.helpers.InstantSearch;
-import com.algolia.instantsearch.helpers.Searcher;
-import com.equip.equip.EquipApplication;
 import com.equip.equip.ExtraUIElements.Drawer.DrawerHeader;
 import com.equip.equip.ExtraUIElements.Drawer.DrawerMenuItem;
 import com.equip.equip.Fragments.EquipmentListFragments.MyEquipmentListFragment;
-import com.equip.equip.Fragments.EquipmentListFragments.NearbyListFragment;
+import com.equip.equip.Fragments.EquipmentListFragments.FilterListFragment;
+import com.equip.equip.Fragments.FilterFragment;
 import com.equip.equip.Fragments.MyRentalsFragment;
 import com.equip.equip.R;
 import com.equip.equip.Util.Search.MySuggestionProvider;
@@ -45,13 +44,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.mindorks.placeholderview.PlaceHolderView;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import ru.dimorinny.floatingtextbutton.FloatingTextButton;
 
@@ -109,7 +102,7 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
 
 //        getSupportFragmentManager()
 //                .beginTransaction()
-//                .replace(R.id.fragment_container, new NearbyListFragment())
+//                .replace(R.id.fragment_container, new FilterListFragment())
 //                .addToBackStack("Nearby")
 //                .commit();
         onDashboardSelected();
@@ -161,20 +154,32 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
     private void setupDrawer(){
         DrawerMenuItem search = new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_SEARCH);
         search.setDrawerCallBack(this);
+        search.setDrawable(getDrawable(R.drawable.baseline_search_black_18));
+
         DrawerMenuItem rentals = new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_MY_RENTALS);
         rentals.setDrawerCallBack(this);
+
         DrawerMenuItem profile = new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_MY_PROFILE);
         profile.setDrawerCallBack(this);
+
         DrawerMenuItem messages = new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_MESSAGES);
         messages.setDrawerCallBack(this);
+
         DrawerMenuItem settings = new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_SETTINGS);
         settings.setDrawerCallBack(this);
+
         DrawerMenuItem logout = new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_LOGOUT);
         logout.setDrawerCallBack(this);
+
         DrawerMenuItem myEquipment = new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_MY_EQUIPMENT);
         myEquipment.setDrawerCallBack(this);
+
         DrawerMenuItem dashboard = new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_DASHBOARD);
         dashboard.setDrawerCallBack(this);
+        dashboard.setDrawable(getDrawable(R.drawable.baseline_dashboard_black_18));
+
+        DrawerMenuItem account = new DrawerMenuItem(this.getApplicationContext(), DrawerMenuItem.DRAWER_MENU_ITEM_ACCOUNT);
+        account.setDrawerCallBack(this);
 
         DrawerHeader drawerHeader = new DrawerHeader(this, mUser.getDisplayName(), mUser.getEmail(), mUser.getPhotoUrl(), new DrawerHeaderListener());
         mDrawerView
@@ -186,6 +191,7 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
                 .addView(rentals)
                 .addView(myEquipment)
 //                .addView(settings)
+                .addView(account)
                 .addView(logout);
         ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.open_drawer, R.string.close_drawer){
             @Override
@@ -205,8 +211,8 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
 
     @Override
     public void onItemSearchSelected() {
-        Intent intent = new Intent(this, SearchActivity.class);
-        startActivity(intent);
+//        Intent intent = new Intent(this, SearchActivity.class);
+//        startActivity(intent);
     }
 
     @Override
@@ -220,6 +226,12 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
         mDrawer.closeDrawers();
         mFab.setVisibility(View.GONE);
 
+    }
+
+    @Override
+    public void onAccountSelected() {
+        Intent intent = new Intent(DashboardActivity.this, AccountEditActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -239,8 +251,8 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
 
     @Override
     public void onDashboardSelected() {
-        NearbyListFragment nearbyListFragment = new NearbyListFragment();
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, nearbyListFragment).addToBackStack("Dashboard").commit();
+        FilterListFragment filterListFragment = new FilterListFragment();
+        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, filterListFragment).addToBackStack("Dashboard").commit();
         getSupportActionBar().setTitle("Nearby Equipment");
 
         mDrawer.closeDrawers();
@@ -309,82 +321,6 @@ public class DashboardActivity extends AppCompatActivity implements DrawerMenuIt
         public void onClick(View v) {
             Intent intent = new Intent(DashboardActivity.this, CreateItemListingActivity.class);
             startActivity(intent);
-        }
-    }
-
-    private class FilterFragment extends DialogFragment{
-        int rawSelected = 5;
-
-        @Nullable
-        @Override
-        public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-            super.onCreateView(inflater, container, savedInstanceState);
-            View v = inflater.inflate(R.layout.fragment_filter_dialog, container, false);
-
-
-            final TextView distanceText = v.findViewById(R.id.miles_text);
-
-            SeekBar distanceBar = v.findViewById(R.id.distance_seek_bar);
-            distanceBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @SuppressLint("SetTextI18n")
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    rawSelected = progress;
-                    distanceText.setText(rawSelected * 25 + " miles");
-                }
-
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-
-                }
-            });
-
-            final EditText addressText = v.findViewById(R.id.filter_custom_address);
-            addressText.setVisibility(View.GONE);
-
-            final RadioGroup radioGroup = v.findViewById(R.id.filter_radio);
-
-            radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(RadioGroup group, int checkedId) {
-                    switch (checkedId){
-                        case R.id.current_location:
-                            addressText.setVisibility(View.GONE);
-                            break;
-                        case R.id.other_location:
-                            addressText.setVisibility(View.VISIBLE);
-                            break;
-                    }
-                }
-            });
-
-            v.findViewById(R.id.filter_button).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    NearbyListFragment nearbyListFragment = new NearbyListFragment();
-                    nearbyListFragment.setFilterDistance(rawSelected * 25);
-                    if (radioGroup.getCheckedRadioButtonId() == R.id.other_location){
-                        nearbyListFragment.setCustomAddr(addressText.getText().toString());
-                    }
-                    getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, nearbyListFragment).addToBackStack("Dashboard").commit();
-                    getSupportActionBar().setTitle("Nearby Equipment");
-                    FilterFragment.this.dismiss();
-                }
-            });
-
-            v.findViewById(R.id.filter_cancel_button).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    FilterFragment.this.dismiss();
-                }
-            });
-
-            return v;
         }
     }
 

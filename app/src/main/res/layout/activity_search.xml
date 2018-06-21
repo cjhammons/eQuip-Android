@@ -12,12 +12,12 @@
         app:queryHint="@string/search_hint"
         app:autofocus="false" />
 
-    <com.algolia.instantsearch.ui.views.Hits
-        android:id="@+id/search_hits"
-        android:layout_width="match_parent"
-        algolia:hitsPerPage="10"
-        algolia:remainingItemsBeforeLoading="10"
-        android:layout_height="wrap_content"
-        algolia:itemLayout="@layout/search_hits_item"/>
+    <!--<com.algolia.instantsearch.ui.views.Hits-->
+        <!--android:id="@+id/search_hits"-->
+        <!--android:layout_width="match_parent"-->
+        <!--algolia:hitsPerPage="10"-->
+        <!--algolia:remainingItemsBeforeLoading="10"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--algolia:itemLayout="@layout/search_hits_item"/>-->
 
 </LinearLayout>

@@ -1,6 +1,7 @@
 package com.equip.equip.Activities;
 
 import android.Manifest;
+import android.accounts.Account;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -25,9 +26,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.equip.equip.DataStructures.User;
 import com.equip.equip.R;
+import com.equip.equip.Util.stripe.MyEphemeralKeyProvider;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -43,7 +46,23 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import com.squareup.picasso.Picasso;
+import com.stripe.android.CustomerSession;
+import com.stripe.android.EphemeralKeyProvider;
+import com.stripe.android.EphemeralKeyUpdateListener;
+import com.stripe.android.Stripe;
+import com.stripe.android.TokenCallback;
+import com.stripe.android.model.Card;
+import com.stripe.android.model.Customer;
+import com.stripe.android.model.Token;
+import com.stripe.android.view.CardInputWidget;
+import com.stripe.android.view.PaymentMethodsActivity;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -58,11 +77,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+
 /**
  * Created by Curtis on 10/27/2017.
  */
 
-public class AccountEditActivity extends Activity {
+public class AccountEditActivity extends Activity  {
 
     private EditText mDisplayNameView;
     private EditText mAddressView;
@@ -70,6 +90,9 @@ public class AccountEditActivity extends Activity {
     private EditText mPhoneView;
     private ImageView mProfilePicture;
     private Button mConfirmButton;
+    private Button mManagePaymentMethodsButton;
+
+    CardInputWidget mCardInputWidget;
 
     private ProgressDialog mProgressDialog;
 
@@ -89,6 +112,7 @@ public class AccountEditActivity extends Activity {
     private Uri cameraUri;
 
 
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,6 +124,8 @@ public class AccountEditActivity extends Activity {
         mPhoneView = (EditText) findViewById(R.id.account_phone);
         mProfilePicture = (ImageView) findViewById(R.id.account_profile_pic);
         mConfirmButton = (Button) findViewById(R.id.confirm_changes);
+//        mCardInputWidget = findViewById(R.id.card_input_widget);
+        mManagePaymentMethodsButton = findViewById(R.id.manage_payments);
 
         mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         mStorageReference = FirebaseStorage.getInstance().getReference().child("users/" + mFirebaseUser.getUid());
@@ -116,6 +142,27 @@ public class AccountEditActivity extends Activity {
 
             }
         });
+
+        CustomerSession.initCustomerSession(new MyEphemeralKeyProvider(new MyEphemeralKeyProvider.ProgressListener() {
+            @Override
+            public void onStringResponse(String string) {
+                if (string.startsWith("Error:")) {
+                    Toast.makeText(AccountEditActivity.this, "Could not get payment information", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }));
+
+        CustomerSession.getInstance().retrieveCurrentCustomer(new CustomerSession.CustomerRetrievalListener() {
+            @Override
+            public void onCustomerRetrieved(@NonNull Customer customer) {
+                mManagePaymentMethodsButton.setEnabled(true);
+            }
+
+            @Override
+            public void onError(int errorCode, @Nullable String errorMessage) {
+                mManagePaymentMethodsButton.setEnabled(false);
+            }
+        });
     }
 
     void populateUI() {
@@ -125,6 +172,30 @@ public class AccountEditActivity extends Activity {
         mEmailView.setText(mUser.getEmail());
         mConfirmButton.setOnClickListener(new confirmChangesListener());
         mProfilePicture.setOnClickListener(new changeProfilePicListener());
+        mManagePaymentMethodsButton.setOnClickListener(new managePaymentMethodsListener());
+
+//        FirebaseDatabase.getInstance().getReference().child("stripe_customers/" + mUser.getUserId() + "/sources/").addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot sourcesSnapshot) {
+////                for (DataSnapshot sourceSnapshot: sourcesSnapshot.getChildren()) {
+//                    Gson gson = new GsonBuilder().create();
+//                    Token token = gson.fromJson(sourcesSnapshot.getValue().toString(), Token.class);
+//
+//                    mCardInputWidget.setCardNumber(token.getCard().getLast4());
+//                    mCardInputWidget.setExpiryDate(token.getCard().getExpMonth(), token.getCard().getExpYear());
+////                }
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
+
+
+
+
         mStorageReference.child("/profilePicture.jpg").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
@@ -139,10 +210,14 @@ public class AccountEditActivity extends Activity {
         mProgressDialog = new ProgressDialog(this);
         mProgressDialog.setMessage(getString(R.string.uploading_photo));
         mProgressDialog.setIndeterminate(true);
+
     }
 
     void updateUser(){
+        boolean doingPhotoUpload = false;
         if (mPhotoStream != null) {
+            mProgressDialog.show();
+            doingPhotoUpload = true;
             UploadTask uploadTask = mStorageReference
                     .child("/profilePicture.jpg")
                     .putStream(mPhotoStream);
@@ -183,18 +258,42 @@ public class AccountEditActivity extends Activity {
             });
         }
 
+
+
         mUser.setDisplayName(mDisplayNameView.getText().toString());
         mUser.setAddress(mAddressView.getText().toString());
         mUser.setEmail(mEmailView.getText().toString());
         mUser.setPhoneNumber(mPhoneView.getText().toString());
 
-        // Here, thisActivity is the current activity
-        if (ContextCompat.checkSelfPermission(this,
+//        Card card = mCardInputWidget.getCard();
+//        if (card != null){
+//            Stripe stripe = new Stripe(this, "pk_test_SeqezrLyAgz4eVotKj6icafX"); //TODO REPLACE WITH REAL KEY
+//            stripe.createToken(card, new TokenCallback() {
+//                @Override
+//                public void onError(Exception error) {
+//                    Toast.makeText(AccountEditActivity.this, "Invalid Card information", Toast.LENGTH_SHORT).show();
+//
+//                }
+//
+//                @Override
+//                public void onSuccess(Token token) {
+//                    GsonBuilder builder = new GsonBuilder();
+//                    Gson gson = builder.create();
+//                    String tokenJson = gson.toJson(token);
+//
+//                    Map<String, Object> childUpdates = new HashMap<>();
+//                    childUpdates.put("stripe_customers/" + mUser.getUserId() + "/sources", tokenJson);
+//                    FirebaseDatabase.getInstance().getReference().child("stripe_customers/" + mUser.getUserId() + "/sources").setValue(tokenJson);
+//                }
+//            });
+//        }
+
+        if (ContextCompat.checkSelfPermission(AccountEditActivity.this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
             // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+            if (ActivityCompat.shouldShowRequestPermissionRationale(AccountEditActivity.this,
                     Manifest.permission.ACCESS_FINE_LOCATION)) {
 
                 // Show an explanation to the user *asynchronously* -- don't block
@@ -205,7 +304,7 @@ public class AccountEditActivity extends Activity {
 
                 // No explanation needed, we can request the permission.
 
-                ActivityCompat.requestPermissions(this,
+                ActivityCompat.requestPermissions(AccountEditActivity.this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         REQUEST_LOCATION_PERMISION);
 
@@ -223,7 +322,7 @@ public class AccountEditActivity extends Activity {
             e.printStackTrace();
         }
         Address addr = new Address(Locale.getDefault());
-        if (geocodes != null) {
+        if (geocodes != null && geocodes.size() > 0) {
             addr = geocodes.get(0);
             double lat = addr.getLatitude();
             double lng = addr.getLongitude();
@@ -233,8 +332,10 @@ public class AccountEditActivity extends Activity {
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("users/" + mUser.getUserId(), userValues);
         FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
-
+        if (!doingPhotoUpload)
+            finish();
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -284,6 +385,8 @@ public class AccountEditActivity extends Activity {
                         .fit()
                         .into(mProfilePicture);
                 break;
+
+
         }
 
     }
@@ -374,7 +477,14 @@ public class AccountEditActivity extends Activity {
         @Override
         public void onClick(View v) {
             updateUser();
-            mProgressDialog.show();
+        }
+    }
+
+    private class managePaymentMethodsListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            Intent intent = PaymentMethodsActivity.newIntent(AccountEditActivity.this);
+            startActivity(intent);
         }
     }
 }

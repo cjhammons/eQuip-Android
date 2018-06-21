@@ -1,6 +1,8 @@
 package com.equip.equip.ExtraUIElements.Drawer;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -29,6 +31,8 @@ public class DrawerMenuItem {
     public static final int DRAWER_MENU_ITEM_LOGOUT = 6;
     public static final int DRAWER_MENU_ITEM_MY_EQUIPMENT = 7;
     public static final int DRAWER_MENU_ITEM_DASHBOARD = 8;
+    public static final int DRAWER_MENU_ITEM_ACCOUNT = 9;
+
 
     private int mMenuPosition;
     private Context mContext;
@@ -40,13 +44,22 @@ public class DrawerMenuItem {
     @View(R.id.itemIcon)
     private ImageView itemIcon;
 
+    private Drawable iconDrawable;
+
     public DrawerMenuItem(Context context, int menuPosition) {
         mContext = context;
         mMenuPosition = menuPosition;
     }
 
+    public void setDrawable(Drawable drawable){
+        this.iconDrawable = drawable;
+    }
+
     @Resolve
     private void onResolved() {
+        if (iconDrawable != null)
+            itemIcon.setImageDrawable(iconDrawable);
+
         switch (mMenuPosition){
             case DRAWER_MENU_ITEM_SEARCH:
                 itemNameTxt.setText(R.string.drawer_search);
@@ -71,6 +84,9 @@ public class DrawerMenuItem {
                 break;
             case DRAWER_MENU_ITEM_DASHBOARD:
                 itemNameTxt.setText(R.string.drawer_dashboard);
+                break;
+            case DRAWER_MENU_ITEM_ACCOUNT:
+                itemNameTxt.setText("Account");
                 break;
         }
     }
@@ -102,6 +118,9 @@ public class DrawerMenuItem {
             case DRAWER_MENU_ITEM_DASHBOARD:
                 mCallBack.onDashboardSelected();
                 break;
+            case DRAWER_MENU_ITEM_ACCOUNT:
+                mCallBack.onAccountSelected();
+                break;
         }
     }
 
@@ -118,5 +137,6 @@ public class DrawerMenuItem {
         void onLogoutSelected();
         void onMyEquipmentSelected();
         void onDashboardSelected();
+        void onAccountSelected();
     }
 }

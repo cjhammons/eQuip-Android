@@ -74,18 +74,19 @@
             android:id="@+id/rate_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Rate"
+            android:text="Rate (hourly)"
             android:textColor="@android:color/black" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginBottom="12dp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:weightSum="2">
 
             <EditText
                 android:id="@+id/equipment_rate_entry"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
@@ -96,7 +97,8 @@
                 android:id="@+id/rate_period_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:visibility="gone" />
         </LinearLayout>
 
         <TextView
