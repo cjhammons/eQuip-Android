@@ -3,6 +3,8 @@ package com.equip.equip.Activities;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -15,11 +17,13 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.equip.equip.DataStructures.Equipment;
 import com.equip.equip.DataStructures.Reservation;
 import com.equip.equip.DataStructures.User;
+import com.equip.equip.Fragments.RentalTimeFragment;
 import com.equip.equip.R;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -55,7 +59,17 @@ public class EquipmentDetailActivity extends AppCompatActivity {
 
     Reservation mReservation;
 
+    String equipmentKey;
 
+    FloatingTextButton reserveButton;
+    TextView availableText;
+    ImageView image;
+    TextView description;
+    TextView name;
+    TextView sellerName;
+    TextView sellerAddress;
+    TextView mRateTextView;
+    TextView mRateUnitTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,10 +81,21 @@ public class EquipmentDetailActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 //        getSupportActionBar().setTitle("");
 
-        final String key = getIntent().getStringExtra("equipmentKey");
+        image = (ImageView) findViewById(R.id.equipment_picture);
+        description = (TextView) findViewById(R.id.equipment_description);
+        name= (TextView) findViewById(R.id.equipment_title);
+        availableText = (TextView) findViewById(R.id.available_text);
+        sellerName = (TextView) findViewById(R.id.seller_name);
+        sellerAddress = (TextView) findViewById(R.id.seller_address);
+        mRateTextView= (TextView) findViewById(R.id.rate_amount);
+        mRateUnitTextView = (TextView) findViewById(R.id.rate_unit);
+        reserveButton = (FloatingTextButton) findViewById(R.id.reserve_item_fab);
+
+
+        equipmentKey = getIntent().getStringExtra("equipmentKey");
         final DatabaseReference databaseReference = FirebaseDatabase.getInstance()
                 .getReference()
-                .child("equipment/" + key);
+                .child("equipment/" + equipmentKey);
 
         ValueEventListener equipmentListener = new ValueEventListener() {
             @Override
@@ -105,17 +130,8 @@ public class EquipmentDetailActivity extends AppCompatActivity {
 //    }
 
     void populateUI(){
-        final ImageView image = (ImageView) findViewById(R.id.equipment_picture);
-        TextView description = (TextView) findViewById(R.id.equipment_description);
-        TextView name = (TextView) findViewById(R.id.equipment_title);
-        TextView availableText = (TextView) findViewById(R.id.available_text);
-        final TextView sellerName = (TextView) findViewById(R.id.seller_name);
-        final TextView sellerAddress = (TextView) findViewById(R.id.seller_address);
-        TextView mRateTextView = (TextView) findViewById(R.id.rate_amount);
-        TextView mRateUnitTextView = (TextView) findViewById(R.id.rate_unit);
 
 
-        FloatingTextButton reserveButton = (FloatingTextButton) findViewById(R.id.reserve_item_fab);
         if (mIsOwner) {
             reserveButton.setVisibility(View.GONE);
         }
@@ -170,8 +186,15 @@ public class EquipmentDetailActivity extends AppCompatActivity {
             }
         };
         databaseReference.addListenerForSingleValueEvent(userEventListener);
-
         reserveButton.setOnClickListener(new ReserveButtonListener());
+
+        findViewById(R.id.seller_container).setOnClickListener(new SellerDetailListener());
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        reserveButton.setVisibility(View.VISIBLE);
         if (!mEquipment.getAvailable()){
             availableText.setText(getString(R.string.not_available).toUpperCase());
             reserveButton.setEnabled(false);
@@ -182,13 +205,10 @@ public class EquipmentDetailActivity extends AppCompatActivity {
         } else {
             availableText.setText(getString(R.string.available).toUpperCase());
         }
-
-        findViewById(R.id.seller_container).setOnClickListener(new SellerDetailListener());
     }
 
     //Only called when the user owns the item and the item has been reserved
     void populateReservationInfo(){
-        findViewById(R.id.reserved_container).setVisibility(View.VISIBLE);
 
         DatabaseReference reservationRef = FirebaseDatabase.getInstance()
                 .getReference()
@@ -200,6 +220,13 @@ public class EquipmentDetailActivity extends AppCompatActivity {
                 Reservation reservation = dataSnapshot.getValue(Reservation.class);
                 mReservation = reservation;
 
+                if (reservation.equipmentId == null) {
+                    findViewById(R.id.reserved_container).setVisibility(View.GONE);
+                    mEquipment.setReservationId("");
+                    FirebaseDatabase.getInstance().getReference().child("equipment/"+ equipmentKey + "/reservationId").removeValue();
+                    return;
+                }
+                findViewById(R.id.reserved_container).setVisibility(View.VISIBLE);
                 //date stuff
                 SimpleDateFormat df = new SimpleDateFormat("MM/dd/yyyy");
                 df.applyPattern("MM/dd/yyyy");
@@ -212,13 +239,15 @@ public class EquipmentDetailActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                if (startDate!=null && endDate !=null) {
-                    String combinedDateString = df.format(startDate) + " - " + df.format(endDate);
-                    ((TextView)findViewById(R.id.date_range)).setText(combinedDateString);
-                } else {
+//                if (startDate!=null && endDate !=null) {
+//                    String combinedDateString = df.format(startDate) + " - " + df.format(endDate);
+//                    ((TextView)findViewById(R.id.date_range)).setText(combinedDateString);
+//                } else {
+//                    ((TextView)findViewById(R.id.date_range)).setText(df.format(startDate));
+//                }
+                if (startDate != null) {
                     ((TextView)findViewById(R.id.date_range)).setText(df.format(startDate));
                 }
-
 
 
                 //get borrower information
@@ -252,61 +281,6 @@ public class EquipmentDetailActivity extends AppCompatActivity {
 
 
 
-    public static class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
-
-        Equipment equipment;
-
-        public DatePickerFragment(Equipment equipment){
-            super();
-            this.equipment = equipment;
-        }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the current date as the default date in the picker
-            final Calendar c = Calendar.getInstance();
-            int year = c.get(Calendar.YEAR);
-            int month = c.get(Calendar.MONTH);
-            int day = c.get(Calendar.DAY_OF_MONTH);
-
-            // Create a new instance of DatePickerDialog and return it
-            return new DatePickerDialog(getActivity(), this, year, month, day);
-        }
-
-
-        @Override
-        public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-            reserve(month+1 + "/" + dayOfMonth + "/" + year);
-        }
-
-        void reserve(String dateString){
-
-            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            String dateTimeReserved = SimpleDateFormat.getDateTimeInstance().format(new Date()).toString();
-            String reservationKey = databaseReference.child("reservations/").push().getKey();
-            Reservation reservation = new Reservation(
-                    equipment.getKey(),
-                    equipment.getOwnerId(),
-                    user.getUid(),
-                    dateString,
-                    dateString,
-                    dateTimeReserved,
-                    reservationKey
-            );
-            equipment.setAvailable(false);
-            equipment.setReservationId(reservationKey);
-
-            Map<String, Object> childUpdates = new HashMap<>();
-            childUpdates.put("/reservations/" + reservationKey, reservation.toMap());
-            childUpdates.put("/equipment/" + equipment.getKey(), equipment.toMap());
-
-            databaseReference.updateChildren(childUpdates);
-            Toast.makeText(getActivity(), R.string.reserved, Toast.LENGTH_SHORT).show();
-            getActivity().finish();
-        }
-    }
-
     private class ReserveButtonListener implements View.OnClickListener {
 
         @Override
@@ -322,8 +296,14 @@ public class EquipmentDetailActivity extends AppCompatActivity {
 //            datePickerDialog.setMinDate(now);
 //            datePickerDialog.show(getFragmentManager(), "TimePickerDialog");
 
-            DialogFragment datePickerFragment = new DatePickerFragment(mEquipment);
-            datePickerFragment.show(getFragmentManager(), "datepicker");
+//            DialogFragment datePickerFragment = new DatePickerFragment(mEquipment);
+//            datePickerFragment.show(getFragmentManager(), "datepicker");
+            reserveButton.setVisibility(View.GONE);
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.reservation_fragment_container, RentalTimeFragment.getInstance(mEquipment))
+                    .addToBackStack("reservationFragment")
+                    .commit();
         }
     }
 

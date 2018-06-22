@@ -16,9 +16,11 @@ class Reservation {
     var dateTimeReserved: String = ""
     var reservedPeriodStartDate: String = ""
     var reservedPeriodEndDate: String = ""
+    var reservedPeriodStartTime: String = ""
+    var reservedPeriodEndTime: String = ""
     var confirmedByOwner: Boolean = false
     var dateTimeConfirmed: String = ""
-
+    var baseCost: Double = 0.0
 
     constructor(){
         //default
@@ -26,7 +28,7 @@ class Reservation {
 
     constructor(equipmentId: String, ownerId: String, borrowerId: String,
                 startDate: String, endDate: String, timeReserved: String,
-                key: String){
+                key: String, startTime: String, endTime: String, baseCost: Double){
         this.equipmentId = equipmentId
         this.ownerId = ownerId
         this.borrowerId = borrowerId
@@ -34,6 +36,9 @@ class Reservation {
         this.reservedPeriodEndDate = endDate
         this.dateTimeReserved = timeReserved
         this.key = key
+        this.reservedPeriodStartTime = startTime
+        this.reservedPeriodEndTime = endTime
+        this.baseCost = baseCost
     }
 
     @Exclude
@@ -53,6 +58,9 @@ class Reservation {
         result.put("reservedPeriodEndDate", reservedPeriodEndDate)
         result.put("confirmedByOwner", confirmedByOwner)
         result.put("dateTimeConfirmed", dateTimeConfirmed)
+        result.put("reservedPeriodStartTime", reservedPeriodStartTime)
+        result.put("reservedPeriodEndTime", reservedPeriodEndTime)
+        result.put("baseCost", baseCost)
         return result
     }
 
