@@ -112,8 +112,7 @@ public class RentalTimeFragment extends Fragment {
             Toast.makeText(getActivity(), "Rental Date can't be in the past!", Toast.LENGTH_SHORT).show();
             return;
         }
-
-//
+        
         Double baseCost = calEnd.get(Calendar.HOUR) - calStart.get(Calendar.HOUR) + 0.0;
 
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
