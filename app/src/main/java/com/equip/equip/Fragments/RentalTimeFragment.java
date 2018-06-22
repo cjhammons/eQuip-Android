@@ -113,7 +113,7 @@ public class RentalTimeFragment extends Fragment {
             return;
         }
 
-
+//
         Double baseCost = calEnd.get(Calendar.HOUR) - calStart.get(Calendar.HOUR) + 0.0;
 
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
