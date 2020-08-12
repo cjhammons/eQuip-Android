@@ -15,7 +15,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RetrofitFactory {
 
     // Put your Base URL here. Unless you customized it, the URL will be something like
-    private static final String BASE_URL = "https://us-central1-equip-a9497.cloudfunctions.net/";
+    private static final String BASE_URL = "<url>";
     private static Retrofit mInstance = null;
 
     public static Retrofit getInstance() {

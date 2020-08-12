@@ -2,9 +2,11 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/android-equip-android.iml" filepath="$PROJECT_DIR$/.idea/modules/android-equip-android.iml" group="equip-android" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/eQuip.iml" filepath="$PROJECT_DIR$/eQuip.iml" />
       <module fileurl="file://$PROJECT_DIR$/equip-android.iml" filepath="$PROJECT_DIR$/equip-android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/equip-android-app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/equip-android-app.iml" group="equip-android/app" />
     </modules>
   </component>
 </project>
