@@ -45,7 +45,7 @@ public class ThumbnailHitView extends AppCompatImageView implements AlgoliaHitVi
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        if (path.equals("")) {
+        if ("".equals(path)) {
             return;
         }
         storageReference.child(path).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {

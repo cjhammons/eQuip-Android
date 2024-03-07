@@ -37,7 +37,7 @@ public class OwnerNameHitView extends AppCompatTextView implements AlgoliaHitVie
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        if (ownerId.equals(""))
+        if ("".equals(ownerId))
             return;
 
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference().child("users").child(ownerId);
