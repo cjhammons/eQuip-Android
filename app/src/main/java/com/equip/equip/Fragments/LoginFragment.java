@@ -91,7 +91,7 @@ public class LoginFragment extends Fragment {
         public void onClick(View v) {
             String email = emailText.getText().toString();
             String password = passwordText.getText().toString();
-            if (email.equals("") || password.equals("")){
+            if ("".equals(email) || "".equals(password)){
                 Toast.makeText(getContext(), getString(R.string.error_blank_password_email), Toast.LENGTH_SHORT).show();
                 return;
             }
