@@ -57,6 +57,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -286,11 +287,7 @@ public class CreateItemListingActivity extends Activity {
                         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
                         String imageFileName = "JPEG_" + timeStamp + "_";
                         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-                        imageFile = File.createTempFile(
-                                imageFileName,  /* prefix */
-                                ".jpg",         /* suffix */
-                                storageDir      /* directory */
-                        );
+                        imageFile = Files.createTempFile(storageDir.toPath(), imageFileName, ".jpg").toFile();
 
                         // Save a file: path for use with ACTION_VIEW intents
                         mPhotoStreams.add(new FileInputStream(imageFile.getAbsolutePath()));
