@@ -60,6 +60,7 @@ import com.stripe.android.model.Customer;
 import com.stripe.android.model.Token;
 import com.stripe.android.view.CardInputWidget;
 import com.stripe.android.view.PaymentMethodsActivity;
+import java.nio.file.Files;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -407,11 +408,7 @@ public class AccountEditActivity extends Activity  {
                         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
                         String imageFileName = "JPEG_" + timeStamp + "_";
                         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-                        imageFile = File.createTempFile(
-                                imageFileName,  /* prefix */
-                                ".jpg",         /* suffix */
-                                storageDir      /* directory */
-                        );
+                        imageFile = Files.createTempFile(storageDir.toPath(), imageFileName, ".jpg").toFile();
 
                         // Save a file: path for use with ACTION_VIEW intents
                         mPhotoStream = new FileInputStream(imageFile.getAbsolutePath());
